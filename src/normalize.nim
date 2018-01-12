@@ -89,22 +89,22 @@ type
   QcStatus {.pure.} = enum
     YES, NO, MAYBE
 
-const nfMasks: array[NfType, array[2, (NfMasks, QcStatus)]] = [
+const nfMasks: array[NfType, array[2, (NfMask, QcStatus)]] = [
   [
-    (NfMasks.NfcQcNo, QcStatus.NO),
-    (NfMasks.NfcQcMaybe, QcStatus.MAYBE)
+    (nfcQcNo, QcStatus.NO),
+    (nfcQcMaybe, QcStatus.MAYBE)
   ],
   [
-    (NfMasks.NfkcQcNo, QcStatus.NO),
-    (NfMasks.NfkcQcMaybe, QcStatus.MAYBE)
+    (nfkcQcNo, QcStatus.NO),
+    (nfkcQcMaybe, QcStatus.MAYBE)
   ],
   [
-    (NfMasks.NfdQcNo, QcStatus.NO),
-    (NfMasks.NfdQcNo, QcStatus.NO)
+    (nfdQcNo, QcStatus.NO),
+    (nfdQcNo, QcStatus.NO)
   ],
   [
-    (NfMasks.NfkdQcNo, QcStatus.NO),
-    (NfMasks.NfkdQcNo, QcStatus.NO)
+    (nfkdQcNo, QcStatus.NO),
+    (nfkdQcNo, QcStatus.NO)
   ]
 ]
 

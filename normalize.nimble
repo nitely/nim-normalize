@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.1.1"
 author        = "Esteban Castro Borsani (@nitely)"
 description   = "Unicode normalization forms (tr15)"
 license       = "MIT"
@@ -11,12 +11,12 @@ skipDirs = @["tests"]
 # Dependencies
 
 requires "nim >= 0.17.2"
-requires "unicodedb >= 0.1 & <= 0.2"
+requires "unicodedb >= 0.2 & <= 0.3"
 
-task tests, "Test":
+task test, "Test":
   exec "nim c -r tests/tests"
 
-task tests2, "Src test":
+task test2, "Src test":
   exec "nim c -r src/normalize"
 
 task docs, "Docs":

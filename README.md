@@ -5,7 +5,7 @@
 
 A library for normalizing unicode text. Implements all the
 Unicode Normalization Form algorithms. Normalization is
-buffered and takes O(n) time and O(1).
+buffered and takes O(n) time and O(1) space.
 
 > Note: the ``iterator`` version takes O(1)
 > space, but the ``proc`` takes O(n) space.
@@ -33,8 +33,8 @@ echo toNFD("È")  # @[Rune(0x0045), Rune(0x0300)]
 ## Tests
 
 ```
-nimble tests
-nimble tests2
+nimble test
+nimble test2
 ```
 
 ## LICENSE
