@@ -624,6 +624,31 @@ when isMainModule:
     doAssert buff.len == 0
 
   block:
+    echo "Test runesN"
+    var i = 0
+    for done, r in runesN(@[Rune(97)]):
+      doAssert done
+      inc i
+    doAssert i == 1
+    for done, r in runesN(@[Rune(97), Rune(98)]):
+      doAssert r in [Rune(97), Rune(98)]
+      if r == Rune(97):
+        doAssert(not done)
+      if r == Rune(98):
+        doAssert(done)
+    var j = 0
+    for done, r in runesN("a"):
+      doAssert done
+      inc j
+    doAssert j == 1
+    for done, r in runesN("ab"):
+      doAssert r in [Rune(97), Rune(98)]
+      if r == Rune(97):
+        doAssert(not done)
+      if r == Rune(98):
+        doAssert(done)
+
+  block:
     echo "Test it does not blow the buffer"
     # This tests that the buffer has a
     # reserved slot for the last char when
