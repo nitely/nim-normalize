@@ -92,33 +92,9 @@ test "Test some NFD for runes":
   let empty: seq[Rune] = @[]
   check empty == toNFD(empty)
 
-type
-  SeqRef[T] = ref seq[T]
-
-proc newSeqRef[T](): SeqRef[T] =
-  new(result)
-  result[] = @[]
-  return result
-
-test "Test some NFD for ref runes":
-  var someRunes = newSeqRef[Rune]()
-  someRunes[].add(Rune(0x1E0A))
-  var res: seq[Rune] =  @[]
-  for cp in toNFD(someRunes):
-    res.add(cp)
-  check @[Rune(0x0044), Rune(0x0307)] == res
-
 test "Test some NFD for string":
   check @[Rune(0x0044), Rune(0x0307)].`$` == toNFD(@[Rune(0x1E0A)].`$`)
   check "" == toNFD("")
-
-test "Test some NFD for iterator":
-  iterator myiter(): Rune {.closure.} =
-    yield Rune(0x1E0A)
-  var res: seq[Rune] = @[]
-  for cp in toNFD(myiter):
-    res.add(cp)
-  check @[Rune(0x0044), Rune(0x0307)] == res
 
 test "Test NFC":
   ##    NFC
@@ -137,14 +113,6 @@ test "Test some NFC for runes":
   check @[Rune(0)] == toNFC(@[Rune(0)])
   let empty: seq[Rune] = @[]
   check empty == toNFC(empty)
-
-test "Test some NFC for ref runes":
-  var someRunes = newSeqRef[Rune]()
-  someRunes[].add(@[Rune(0x1E0A), Rune(0x0323)])
-  var res: seq[Rune] =  @[]
-  for cp in toNFC(someRunes):
-    res.add(cp)
-  check @[Rune(0x1E0C), Rune(0x0307)] == res
 
 test "Test some NFD for string":
   check(@[Rune(0x1E0C), Rune(0x0307)].`$` == toNFC(
@@ -217,3 +185,14 @@ test "Test is NFD":
   check(not isNFD(@[Rune(0x1E0A)]))
   check isNFD(toNFD(@[Rune(0x1E0A)]))
   check isNFD("abc")
+
+#[
+test "Test it does not blow the buffer":
+  var text = @[Rune(0x0041)]
+  for i in 0 ..< 31:
+    text.add(Rune(0x0300))
+  var i = 0
+  for cp in toNFC(text):
+    inc i
+  check i == 32
+]#

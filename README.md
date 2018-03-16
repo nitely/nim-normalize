@@ -34,7 +34,6 @@ echo toNFD("È")  # @[Rune(0x0045), Rune(0x0300)]
 
 ```
 nimble test
-nimble test2
 ```
 
 ## LICENSE

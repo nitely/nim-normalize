@@ -20,20 +20,12 @@ import unicode
 
 import unicodedb
 
-iterator items[T](it: (iterator: T)): T {.inline.} =
-  # This is missing from stdlib
-  while true:
-    let i = it()
-    if finished(it):
-      break
-    yield i
-
 type
   Buffer = tuple
     ## A buffer has a fixed size but works
     ## as if it were dynamic by tracking
     ## the last index in use
-    data: array[32, int]
+    data: array[32, int]  # todo: int -> int32 or Rune
     pt: int
   UnBuffer = seq[int]
     ## For testing purposes
@@ -45,19 +37,29 @@ iterator items(buffer: Buffer): int {.inline.} =
     yield buffer.data[i]
     inc i
 
-proc isFull(buffer: Buffer): bool {.inline.} =
-  buffer.pt == buffer.data.len
+iterator pairs(buffer: Buffer): (int, int) {.inline.} =
+  var i = 0
+  for n in buffer:
+    yield (i, n)
+    inc i
+
+proc left(buffer: Buffer): int {.inline.} =
+  ## return capacity left
+  buffer.data.len - buffer.pt
 
 proc clear(buffer: var Buffer) {.inline.} =
   buffer.pt = 0
 
 proc add(buffer: var Buffer, elm: int) {.inline.} =
-  assert(not buffer.isFull)
+  assert buffer.left > 0
   buffer.data[buffer.pt] = elm
   inc buffer.pt
 
 proc len(buffer: Buffer): int {.inline.} =
   buffer.pt
+
+proc high(buffer: Buffer): int {.inline.} =
+  buffer.pt - 1
 
 proc setLen(buffer: var Buffer, i: int) {.inline.} =
   assert i <= buffer.data.len
@@ -90,31 +92,22 @@ type
     YES, NO, MAYBE
 
 const nfMasks: array[NfType, array[2, (NfMask, QcStatus)]] = [
-  [
-    (nfcQcNo, QcStatus.NO),
-    (nfcQcMaybe, QcStatus.MAYBE)
-  ],
-  [
-    (nfkcQcNo, QcStatus.NO),
-    (nfkcQcMaybe, QcStatus.MAYBE)
-  ],
-  [
-    (nfdQcNo, QcStatus.NO),
-    (nfdQcNo, QcStatus.NO)
-  ],
-  [
-    (nfkdQcNo, QcStatus.NO),
-    (nfkdQcNo, QcStatus.NO)
-  ]
-]
+  [(nfcQcNo, QcStatus.NO),
+   (nfcQcMaybe, QcStatus.MAYBE)],
+  [(nfkcQcNo, QcStatus.NO),
+   (nfkcQcMaybe, QcStatus.MAYBE)],
+  [(nfdQcNo, QcStatus.NO),
+   (nfdQcNo, QcStatus.NO)],
+  [(nfkdQcNo, QcStatus.NO),
+   (nfkdQcNo, QcStatus.NO)]]
 
 proc isAllowed(qc: int, nfType: NfType): QcStatus {.inline.} =
   ## Return the quick check property value
   result = QcStatus.YES
   for mask, status in items(nfMasks[nfType]):
-    if (qc and mask.ord) != 0:
+    if mask in qc:
       result = status
-      break
+      return
 
 proc primaryComposite(cpA: int, cpB: int): int {.inline.} =
   ## Find the composition of two decomposed CPs
@@ -141,7 +134,8 @@ proc hangulComposition(cpA: int, cpB: int): int =
     VIndex = cpB - VBase
   if 0 <= LIndex and LIndex < LCount and
       0 <= VIndex and VIndex < VCount:
-    return SBase + (LIndex * VCount + VIndex) * TCount
+    result = SBase + (LIndex * VCount + VIndex) * TCount
+    return
 
   let
     SIndex = cpA - SBase
@@ -149,9 +143,10 @@ proc hangulComposition(cpA: int, cpB: int): int =
   if 0 <= SIndex and SIndex < SCount and
       (SIndex mod TCount) == 0 and
       0 < TIndex and TIndex < TCount:
-    return cpA + TIndex
+    result = cpA + TIndex
+    return
 
-  return -1
+  result = -1
 
 proc canonicalComposition(cps: var SomeBuffer) =
   ## In-place composition
@@ -225,9 +220,11 @@ proc canonicSort(cps, cccs: var SomeBuffer) =
   # * Reorderable pair: Two adjacent characters A and B in a
   #   coded character sequence <A, B> are a Reorderable Pair
   #   if and only if ccc(A) > ccc(B) > 0.
-  var i = cps.len - 1
+  var
+    i = cps.len - 1
+    isSwapped = false
   while i > 0:
-    var isSwapped = false
+    isSwapped = false
     for j in 0 ..< i:
       let
         cccA = cccs[j]
@@ -243,7 +240,7 @@ proc canonicSort(cps, cccs: var SomeBuffer) =
 proc hangulDecomposition(cp: int): Buffer =
   let SIndex = cp - SBase
   if 0 > SIndex and SIndex >= SCount:
-    return result
+    return
 
   result.add(LBase + SIndex div NCount)  # L
   result.add(VBase + (SIndex mod NCount) div TCount)  # V
@@ -261,11 +258,10 @@ proc canonicalDcp(cp: int): Buffer =
   ## Return 4 code points at most.
   ## It does a full canonical decomposition
   if cp.isHangul:
-    let hdcp = hangulDecomposition(cp)
-    if hdcp.len == 0:
+    result = hangulDecomposition(cp)
+    if result.len == 0:
       result.add(cp)
-      return result
-    return hdcp
+    return
 
   var
     cpA = cp
@@ -289,11 +285,10 @@ proc compatibilityDecomposition(cp: int): Buffer =
   ## Return 18 code points at most.
   ## It does a full decomposition
   if cp.isHangul:
-    let hdcp = hangulDecomposition(cp)
-    if hdcp.len == 0:
+    result = hangulDecomposition(cp)
+    if result.len == 0:
       result.add(cp)
-      return result
-    return hdcp
+    return
 
   var queue: Buffer
   queue.add(cp)
@@ -307,148 +302,161 @@ proc compatibilityDecomposition(cp: int): Buffer =
       result.add(curCp)
   result.reverse()
 
-const
-  nfDecompositions = [
-    canonicalDcp,
-    compatibilityDecomposition,
-    canonicalDcp,
-    compatibilityDecomposition]
-  graphemeJoiner = 0x034F
+const graphemeJoiner = 0x034F
 
-proc toNF(cps: (iterator: Rune), nfType: NfType): (iterator: Rune) =
+template decompose(result, cp, nfType) =
+  when nfType in {NfType.NFC, NfType.NFD}:
+    result = canonicalDcp(cp)
+  else:
+    result = compatibilityDecomposition(cp)
+
+iterator runesN(s: string): (bool, Rune) {.inline.} =
+  var
+    n = 0
+    r: Rune
+  while n < len(s):
+    fastRuneAt(s, n, r, true)
+    yield (n == len(s), r)
+
+iterator runesN(s: seq[Rune]): (bool, Rune) {.inline.} =
+  for i, r in s:
+    yield (i == s.high, r)
+
+iterator toNF(
+    s: (seq[Rune] | string),
+    nfType: static[NfType]): Rune {.inline.} =
   ## Buffered unicode normalization
-  let
-    decompose = nfDecompositions[nfType.ord]
-    isComposable = nfType in {NfType.NFC, NfType.NFKC}
   var
     buff: Buffer
     cccs: Buffer
+    dcps: Buffer
     lastCCC = 0
-  result = iterator: Rune {.closure.} =
-    for rune in cps:
-      let cp = int(rune)
-      for dcp in decompose(cp):
-        let
-          props = properties(dcp)
-          ccc = combining(props)
-          qc = quickCheck(props)
-          isSafeBreak = (
-            isAllowed(qc, nfType) == QcStatus.YES and
-            ccc == 0)
-        if isSafeBreak or buff.isFull:
-          # Flush the buffer
-          buff.canonicSort(cccs)
-          if isComposable:
-            buff.canonicalComposition()
-          for bcp in buff:
-            yield Rune(bcp)
-          buff.clear()
-          cccs.clear()
-          # Put a CGJ beetwen non-starters
-          if lastCCC != 0 and ccc != 0:
-            yield Rune(graphemeJoiner)
-        lastCCC = ccc
-        buff.add(dcp)
-        cccs.add(ccc)
-    # Flush the buffer
-    buff.canonicSort(cccs)
-    if isComposable:
-      buff.canonicalComposition()
-    for bcp in buff:
-      yield Rune(bcp)
+  for done, r in runesN(s):
+    decompose(dcps, r.int, nfType)
+    for j, cp in pairs(dcps):
+      let
+        finished = done and j == dcps.high
+        props = properties(cp)
+        ccc = combining(props)
+        qc = quickCheck(props)
+        isSafeBreak = (
+          isAllowed(qc, nfType) == QcStatus.YES and
+          ccc == 0)
+      if finished or isSafeBreak or buff.left == 1:
+        if finished:
+          buff.add(cp)
+          cccs.add(ccc)
+        # Flush the buffer
+        buff.canonicSort(cccs)
+        when nfType in {NfType.NFC, NfType.NFKC}:
+          buff.canonicalComposition()
+        for bcp in items(buff):
+          yield Rune(bcp)
+        buff.clear()
+        cccs.clear()
+        # Put a CGJ beetwen non-starters
+        if lastCCC != 0 and ccc != 0:
+          buff.add(graphemeJoiner)
+      lastCCC = ccc
+      buff.add(cp)
+      cccs.add(ccc)
 
-proc toRunes(text: seq[Rune]): (iterator: Rune) =
-  result = iterator: Rune {.closure.} =
-    for cp in text:
-      yield cp
+iterator toNFD*(s: string): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFD):
+    yield r
 
-proc toRunes(text: ref seq[Rune]): (iterator: Rune) =
-  result = iterator: Rune {.closure.} =
-    for cp in text[]:
-      yield cp
+iterator toNFD*(s: seq[Rune]): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFD):
+    yield r
 
-proc toRunes(text: string): (iterator: Rune) =
-  result = iterator: Rune {.closure.} =
-    for cp in runes(text):
-      yield cp
+iterator toNFC*(s: string): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFC):
+    yield r
 
-proc toRunes(text: ref string): (iterator: Rune) =
-  result = iterator: Rune {.closure.} =
-    for cp in runes(text[]):
-      yield cp
+iterator toNFC*(s: seq[Rune]): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFC):
+    yield r
 
-proc toRunes(text: (iterator: Rune)): (iterator: Rune) {.inline.} =
-  # no-op
-  text
+iterator toNFKD*(s: string): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFKD):
+    yield r
 
-type
-  IterRunes* = (seq[Rune] | ref seq[Rune] | (iterator: Rune))
+iterator toNFKD*(s: seq[Rune]): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFKD):
+    yield r
 
-iterator toNFD*(cps: IterRunes): Rune {.inline.} =
-  ## Iterates over each normalized unicode character.
-  ## Passing a ref or iterator will make this take O(1) space,
-  ## otherwise the sequence gets copied once.
-  # Call items explicitly here coz it's private
-  for cp in toNF(toRunes(cps), NfType.NFD).items:
-    yield cp
+iterator toNFKC*(s: string): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFKC):
+    yield r
 
-iterator toNFC*(cps: IterRunes): Rune {.inline.} =
-  ## Iterates over each normalized unicode character.
-  ## Passing a ref or iterator will make this take O(1) space,
-  ## otherwise the sequence gets copied once.
-  for cp in toNF(toRunes(cps), NfType.NFC).items:
-    yield cp
+iterator toNFKC*(s: seq[Rune]): Rune {.inline.} =
+  ## Iterates over each normalized unicode character
+  for r in toNF(s, NfType.NFKC):
+    yield r
 
-iterator toNFKD*(cps: IterRunes): Rune {.inline.} =
-  ## Iterates over each normalized unicode character.
-  ## Passing a ref or iterator will make this take O(1) space,
-  ## otherwise the sequence gets copied once.
-  for cp in toNF(toRunes(cps), NfType.NFKD).items:
-    yield cp
+proc toNF(s: seq[Rune], nfType: static[NfType]): seq[Rune] =
+  # fixme: normalization may take 3x (or more?)
+  # times the len of the original string
+  result = newSeqOfCap[Rune](s.len)
+  for r in toNF(s, nfType):
+    result.add(r)
 
-iterator toNFKC*(cps: IterRunes): Rune {.inline.} =
-  ## Iterates over each normalized unicode character.
-  ## Passing a ref or iterator will make this take O(1) space,
-  ## otherwise the sequence gets copied once.
-  for cp in toNF(toRunes(cps), NfType.NFKC).items:
-    yield cp
+proc toNF(s: string, nfType: static[NfType]): string =
+  # fixme: normalization may take 3x (or more?)
+  # times the len of the original string
+  result = newStringOfCap(s.len)
+  for r in toNF(s, nfType):
+    result.add(r.toUTF8)
 
-proc toNF(cps: seq[Rune], nfType: NfType): seq[Rune] {.inline.} =
-  result = newSeqOfCap[Rune](cps.len)
-  for cp in toNF(toRunes(cps), nfType):
-    result.add(cp)
-
-proc toNF(cps: string, nfType: NfType): string {.inline.} =
-  result = newStringOfCap(cps.len)
-  for cp in toNF(toRunes(cps), nfType):
-    result.add(cp.toUTF8)
-
-proc toNFD*[T: seq[Rune] | string](cps: T): T =
+proc toNFD*(s: string): string =
   ## Return the normalized input
-  toNF(cps, NfType.NFD)
+  toNF(s, NfType.NFD)
 
-proc toNFC*[T: seq[Rune] | string](cps: T): T =
+proc toNFD*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input
-  toNF(cps, NfType.NFC)
+  toNF(s, NfType.NFD)
 
-proc toNFKD*[T: seq[Rune] | string](cps: T): T =
+proc toNFC*(s: string): string =
   ## Return the normalized input
-  toNF(cps, NfType.NFKD)
+  toNF(s, NfType.NFC)
 
-proc toNFKC*[T: seq[Rune] | string](cps: T): T =
+proc toNFC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input
-  toNF(cps, NfType.NFKC)
+  toNF(s, NfType.NFC)
 
-proc toNFUnbuffered(cps: seq[Rune], nfType: NfType): seq[Rune] =
+proc toNFKD*(s: string): string =
+  ## Return the normalized input
+  toNF(s, NfType.NFKD)
+
+proc toNFKD*(s: seq[Rune]): seq[Rune] =
+  ## Return the normalized input
+  toNF(s, NfType.NFKD)
+
+proc toNFKC*(s: string): string =
+  ## Return the normalized input
+  toNF(s, NfType.NFKC)
+
+proc toNFKC*(s: seq[Rune]): seq[Rune] =
+  ## Return the normalized input
+  toNF(s, NfType.NFKC)
+
+proc toNFUnbuffered(cps: seq[Rune], nfType: static[NfType]): seq[Rune] =
   ## This exists for testing purposes
-  let
-    decompose = nfDecompositions[nfType.ord]
-    isComposable = nfType in [NfType.NFC, NfType.NFKC]
+  let isComposable = nfType in [NfType.NFC, NfType.NFKC]
   var
     cpsB = newSeqOfCap[int](result.len)
     cccs = newSeqOfCap[int](result.len)
+    dcps: Buffer
   for rune in cps:
-    for dcp in decompose(rune.int):
+    decompose(dcps, rune.int, nfType)
+    for dcp in dcps:
       cpsB.add(dcp)
       cccs.add(combining(dcp))
   cpsB.canonicSort(cccs)
@@ -465,10 +473,10 @@ proc isSupplementary(cp: int): bool {.inline.} =
     (0x100000 <= cp and cp <= 0x10FFFD) or
     (0xF0000 <= cp and cp <= 0xFFFFF))
 
-iterator runes(cps: seq[Rune]): Rune {.inline.} =
+iterator runes(s: seq[Rune]): Rune {.inline.} =
   # no-op
-  for cp in cps:
-    yield cp
+  for r in s:
+    yield r
 
 proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
   ## isNFx(s) is true if and only
@@ -488,49 +496,146 @@ proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
       props = properties(cp)
       canonicalClass = combining(props)
     if lastCanonicalClass > canonicalClass and canonicalClass != 0:
-      return QcStatus.NO
+      result = QcStatus.NO
+      return
     let check = isAllowed(quickCheck(props), nfType)
     if check == QcStatus.NO:
-      return QcStatus.NO
+      result = QcStatus.NO
+      return
     if check == QcStatus.MAYBE:
       result = QcStatus.MAYBE
     lastCanonicalClass = canonicalClass
 
-proc isNFC*(cps: (seq[Rune] | string)): bool {.inline.} =
+proc isNFC*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not
-  isNF(cps, NfType.NFC) == QcStatus.YES
+  isNF(s, NfType.NFC) == QcStatus.YES
 
-proc isNFD*(cps: (seq[Rune] | string)): bool {.inline.} =
+proc isNFC*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not
-  isNF(cps, NfType.NFD) == QcStatus.YES
+  isNF(s, NfType.NFC) == QcStatus.YES
 
-proc isNFKC*(cps: (seq[Rune] | string)): bool {.inline.} =
+proc isNFD*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not
-  isNF(cps, NfType.NFKC) == QcStatus.YES
+  isNF(s, NfType.NFD) == QcStatus.YES
 
-proc isNFKD*(cps: (seq[Rune] | string)): bool {.inline.} =
+proc isNFD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not
-  isNF(cps, NfType.NFKD) == QcStatus.YES
+  isNF(s, NfType.NFD) == QcStatus.YES
+
+proc isNFKC*(s: string): bool {.inline.} =
+  ## Return whether the unicode characters
+  ## are normalized or not
+  isNF(s, NfType.NFKC) == QcStatus.YES
+
+proc isNFKC*(s: seq[Rune]): bool {.inline.} =
+  ## Return whether the unicode characters
+  ## are normalized or not
+  isNF(s, NfType.NFKC) == QcStatus.YES
+
+proc isNFKD*(s: string): bool {.inline.} =
+  ## Return whether the unicode characters
+  ## are normalized or not
+  isNF(s, NfType.NFKD) == QcStatus.YES
+
+proc isNFKD*(s: seq[Rune]): bool {.inline.} =
+  ## Return whether the unicode characters
+  ## are normalized or not
+  isNF(s, NfType.NFKD) == QcStatus.YES
 
 when isMainModule:
-  echo len(toNFC(@[Rune(0x00C8)]))
-  echo len(toNFD(@[Rune(0x00C8)]))
-  echo "Test random text"
-  var text: seq[Rune] = @[]
-  for line in lines("./tests/TestNormRandomText.txt"):
-    for r in runes(line):
-      text.add(r)
-  doAssert toNFUnbuffered(text, NfType.NFD) == toNFD(text)
-  doAssert toNFUnbuffered(text, NfType.NFC) == toNFC(text)
-  doAssert toNFUnbuffered(text, NfType.NFKC) == toNFKC(text)
-  doAssert toNFUnbuffered(text, NfType.NFKD) == toNFKD(text)
+  block:
+    echo "Test random text"
+    var text: seq[Rune] = @[]
+    for line in lines("./tests/TestNormRandomText.txt"):
+      for r in runes(line):
+        text.add(r)
+    doAssert toNFUnbuffered(text, NfType.NFD) == toNFD(text)
+    doAssert toNFUnbuffered(text, NfType.NFC) == toNFC(text)
+    doAssert toNFUnbuffered(text, NfType.NFKC) == toNFKC(text)
+    doAssert toNFUnbuffered(text, NfType.NFKD) == toNFKD(text)
 
-  doAssert isNFD(toNFD(text))
-  doAssert isNFC(toNFC(text))
-  doAssert isNFKC(toNFKC(text))
-  doAssert isNFKD(toNFKD(text))
-  echo "Tested: " & $text.len & " chars"
+    doAssert isNFD(toNFD(text))
+    doAssert isNFC(toNFC(text))
+    doAssert isNFKC(toNFKC(text))
+    doAssert isNFKD(toNFKD(text))
+    echo "Tested: " & $text.len & " chars"
+
+  echo "Test Buffer"
+  block:
+    echo "Test len"
+    var buff: Buffer
+    doAssert buff.len == 0
+    buff.add(1)
+    buff.add(1)
+    buff.add(1)
+    doAssert buff.len == 3
+    buff.setLen(2)
+    doAssert buff.len == 2
+  block:
+    echo "Test left"
+    var buff: Buffer
+    doAssert buff.left == buff.data.len
+    var i = 0
+    while buff.left > 0:
+      buff.add(1)
+      inc i
+    doAssert buff.left == 0
+    doAssert i == buff.len
+    doAssert i > 1
+  block:
+    echo "Test iter"
+    var buff: Buffer
+    buff.add(1)
+    buff.add(1)
+    var i = 0
+    for n in buff:
+      doAssert n == 1
+      inc i
+    doAssert i == 2
+  block:
+    echo "Test setLen"
+    var buff: Buffer
+    buff.add(1)
+    buff.add(1)
+    buff.add(1)
+    doAssert buff.len == 3
+    buff.setLen(2)
+    doAssert buff.len == 2
+  block:
+    echo "Test high"
+    var buff: Buffer
+    doAssert buff.high == -1
+    buff.add(1)
+    buff.add(1)
+    buff.add(1)
+    doAssert buff.high == 2
+  block:
+    echo "Test clear"
+    var buff: Buffer
+    buff.add(1)
+    buff.add(1)
+    buff.add(1)
+    doAssert buff.len == 3
+    buff.clear()
+    doAssert buff.len == 0
+
+  block:
+    echo "Test it does not blow the buffer"
+    # This tests that the buffer has a
+    # reserved slot for the last char when
+    # the buffer is full.
+    # No other test catches this since it can
+    # only occur with malformed text
+    var buff: Buffer
+    doAssert buff.data.len > 0
+    var text = newSeq[Rune]()
+    for i in 0 .. buff.data.len:
+      text.add(Rune(0x0300))
+    var i = 0
+    for _ in toNFC(text):
+      inc i
+    doAssert i == text.len + 1  # + joiner char

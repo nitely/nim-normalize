@@ -1,3 +1,10 @@
+v0.2.0
+==================
+
+* Remove APIs taking `ref seq[Rune]` and `iterator: Rune` param
+* Fix: passing a `seq` or a `string` won't make a copy
+* Fix: nimble file unicodedb dependency version range
+
 v0.1.1
 ==================
 
