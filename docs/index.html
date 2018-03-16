@@ -12,7 +12,7 @@
 <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAAAAAUAAAAF////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAAAAAIAAABbAAAAlQAAAKIAAACbAAAAmwAAAKIAAACVAAAAWwAAAAL///8A////AP///wD///8A////AAAAABQAAADAAAAAYwAAAA3///8A////AP///wD///8AAAAADQAAAGMAAADAAAAAFP///wD///8A////AP///wAAAACdAAAAOv///wD///8A////AP///wD///8A////AP///wD///8AAAAAOgAAAJ3///8A////AP///wAAAAAnAAAAcP///wAAAAAoAAAASv///wD///8A////AP///wAAAABKAAAAKP///wAAAABwAAAAJ////wD///8AAAAAgQAAABwAAACIAAAAkAAAAJMAAACtAAAAFQAAABUAAACtAAAAkwAAAJAAAACIAAAAHAAAAIH///8A////AAAAAKQAAACrAAAAaP///wD///8AAAAARQAAANIAAADSAAAARf///wD///8AAAAAaAAAAKsAAACk////AAAAADMAAACcAAAAnQAAABj///8A////AP///wAAAAAYAAAAGP///wD///8A////AAAAABgAAACdAAAAnAAAADMAAAB1AAAAwwAAAP8AAADpAAAAsQAAAE4AAAAb////AP///wAAAAAbAAAATgAAALEAAADpAAAA/wAAAMMAAAB1AAAAtwAAAOkAAAD/AAAA/wAAAP8AAADvAAAA3gAAAN4AAADeAAAA3gAAAO8AAAD/AAAA/wAAAP8AAADpAAAAtwAAAGUAAAA/AAAA3wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAADfAAAAPwAAAGX///8A////AAAAAEgAAADtAAAAvwAAAL0AAADGAAAA7wAAAO8AAADGAAAAvQAAAL8AAADtAAAASP///wD///8A////AP///wD///8AAAAAO////wD///8A////AAAAAIcAAACH////AP///wD///8AAAAAO////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AAD4HwAA7/cAAN/7AAD//wAAoYUAAJ55AACf+QAAh+EAAAAAAADAAwAA4AcAAP5/AAD//wAA//8AAA=="/>
 
 <!-- Google fonts -->
-<link href='https://fonts.googleapis.com/css?family=Raleway:400,600,900' rel='stylesheet' type='text/css'/>
+<link href='https://fonts.googleapis.com/css?family=Lato:400,600,900' rel='stylesheet' type='text/css'/>
 <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600' rel='stylesheet' type='text/css'/>
 
 <!-- CSS -->
@@ -45,18 +45,19 @@ html {
 
 /* Where we want fancier font if available */
 h1, h2, h3, h4, h5, h6, p.module-desc, table.docinfo + blockquote p, table.docinfo blockquote p, h1 + blockquote p {
-  font-family: "Raleway", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif !important; }
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif !important; }
 
 h1.title {
   font-weight: 900; }
 
 body {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 20px;
-  color: #666;
-  background-color: rgba(252, 248, 244, 0.75); }
+  color: #444;
+  letter-spacing: 0.15px;
+  background-color: rgba(252, 248, 244, 0.45); }
 
 /* Skeleton grid */
 .container {
@@ -172,8 +173,8 @@ cite {
   font-style: italic !important; }
 
 dt > pre {
-  border-color: rgba(0, 0, 0, 0.15);
-  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
   margin: 15px 0px 5px; }
 
 dd > pre {
@@ -189,6 +190,17 @@ dd > pre {
 .line-nums-table {
   width: 100%;
   table-layout: fixed; }
+
+/* Nim search input */
+div#searchInput {
+  margin-bottom: 8px;
+}
+div#searchInput input#searchInput {
+  width: 10em;
+}
+div.search-groupby {
+  margin-bottom: 8px;
+}
 
 table.line-nums-table {
   border-radius: 4px;
@@ -333,7 +345,7 @@ img {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
 
 p {
-  margin: 0 0 12px; }
+  margin: 0 0 8px; }
 
 small {
   font-size: 85%; }
@@ -353,7 +365,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-weight: 600;
   line-height: 20px;
   color: inherit;
@@ -361,6 +373,7 @@ h6 {
 
 h1 {
   font-size: 2em;
+  font-weight: 400;
   padding-bottom: .15em;
   border-bottom: 1px solid #aaaaaa;
   margin-top: 1.0em;
@@ -491,13 +504,13 @@ pre {
   box-sizing: border-box;
   min-width: calc(100% - 19.5px);
   padding: 9.5px;
-  margin: 0.25em 10px 0.25em 10px;
-  font-size: 14px;
+  margin: 0.25em 10px 10px 10px;
+  font-size: 15px;
   line-height: 20px;
   white-space: pre !important;
   overflow-y: hidden;
   overflow-x: visible;
-  background-color: whitesmoke;
+  background-color: rgba(0, 0, 0, 0.01);
   border: 1px solid #cccccc;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -776,14 +789,14 @@ div.admonition p.admonition-title, div.hint p.admonition-title,
 div.important p.admonition-title, div.note p.admonition-title,
 div.tip p.admonition-title {
   font-weight: bold;
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif; }
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif; }
 
 div.attention p.admonition-title, div.caution p.admonition-title,
 div.danger p.admonition-title, div.error p.admonition-title,
 div.warning p.admonition-title, .code .error {
   color: #b30000;
   font-weight: bold;
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif; }
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif; }
 
 /* Uncomment (and remove this text!) to get reduced vertical space in
    compound paragraphs.
@@ -830,7 +843,7 @@ div.sidebar {
   clear: right; }
 
 div.sidebar p.rubric {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-size: medium; }
 
 div.system-messages {
@@ -937,12 +950,12 @@ p.rubric {
   text-align: center; }
 
 p.sidebar-title {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: larger; }
 
 p.sidebar-subtitle {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-weight: bold; }
 
 p.topic-title {
@@ -984,15 +997,15 @@ pre.code .inserted, code .inserted {
   background-color: #A3D289; }
 
 span.classifier {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-style: oblique; }
 
 span.classifier-delimiter {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
   font-weight: bold; }
 
 span.interpreted {
-  font-family: "Helvetica Neue", "HelveticaNeue", "Raleway", Helvetica, Arial, sans-serif; }
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif; }
 
 span.option {
   white-space: nowrap; }
@@ -1015,7 +1028,7 @@ table.docinfo {
   margin: 0em;
   margin-top: 2em;
   margin-bottom: 2em;
-  font-family: "Raleway", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif !important;
+  font-family: "Lato", "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif !important;
   color: #444444; }
 
 table.docutils {
@@ -1145,21 +1158,26 @@ dt pre > span.Operator ~ span.Identifier, dt pre > span.Operator ~ span.Operator
   background-repeat: no-repeat;
   background-image: url("data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAAAAAUAAAAF////AP///wD///8A////AP///wD///8A////AP///wD///8A////AAAAAAIAAABbAAAAlQAAAKIAAACbAAAAmwAAAKIAAACVAAAAWwAAAAL///8A////AP///wD///8A////AAAAABQAAADAAAAAYwAAAA3///8A////AP///wD///8AAAAADQAAAGMAAADAAAAAFP///wD///8A////AP///wAAAACdAAAAOv///wD///8A////AP///wD///8A////AP///wD///8AAAAAOgAAAJ3///8A////AP///wAAAAAnAAAAcP///wAAAAAoAAAASv///wD///8A////AP///wAAAABKAAAAKP///wAAAABwAAAAJ////wD///8AAAAAgQAAABwAAACIAAAAkAAAAJMAAACtAAAAFQAAABUAAACtAAAAkwAAAJAAAACIAAAAHAAAAIH///8A////AAAAAKQAAACrAAAAaP///wD///8AAAAARQAAANIAAADSAAAARf///wD///8AAAAAaAAAAKsAAACk////AAAAADMAAACcAAAAnQAAABj///8A////AP///wAAAAAYAAAAGP///wD///8A////AAAAABgAAACdAAAAnAAAADMAAAB1AAAAwwAAAP8AAADpAAAAsQAAAE4AAAAb////AP///wAAAAAbAAAATgAAALEAAADpAAAA/wAAAMMAAAB1AAAAtwAAAOkAAAD/AAAA/wAAAP8AAADvAAAA3gAAAN4AAADeAAAA3gAAAO8AAAD/AAAA/wAAAP8AAADpAAAAtwAAAGUAAAA/AAAA3wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAADfAAAAPwAAAGX///8A////AAAAAEgAAADtAAAAvwAAAL0AAADGAAAA7wAAAO8AAADGAAAAvQAAAL8AAADtAAAASP///wD///8A////AP///wD///8AAAAAO////wD///8A////AAAAAIcAAACH////AP///wD///8AAAAAO////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AAD4HwAA7/cAAN/7AAD//wAAoYUAAJ55AACf+QAAh+EAAAAAAADAAwAA4AcAAP5/AAD//wAA//8AAA==");
   margin-bottom: -5px; }
-  div.pragma {
-    display: none;
-  }
-  span.pragmabegin {
-    cursor: pointer;
-  }
-  span.pragmaend {
-    cursor: pointer;
-  }
+div.pragma {
+  display: none;
+}
+span.pragmabegin {
+  cursor: pointer;
+}
+span.pragmaend {
+  cursor: pointer;
+}
 
 div.search_results {
   background-color: antiquewhite;
   margin: 3em;
   padding: 1em;
   border: 1px solid #4d4d4d;
+}
+
+div#global-links ul {
+  margin-left: 0;
+  list-style-type: none;
 }
 </style>
 
@@ -1198,7 +1216,11 @@ function main() {
     <h1 class="title">Module normalize</h1>
     <div class="row">
   <div class="three columns">
-  <div>
+  <div id="global-links">
+    <ul class="simple">
+    </ul>
+  </div>
+  <div id="searchInput">
     Search: <input type="text" id="searchInput"
       onkeyup="search()" />
   </div>
@@ -1217,46 +1239,62 @@ function main() {
   </ul>
 </li>
 <li>
-  <a class="reference reference-toplevel" href="#7" id="57">Types</a>
-  <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#IterRunes"
-    title="IterRunes = (seq[Rune] | ref seq[Rune] | (iterator (): Rune))"><wbr />Iter<wbr />Runes<span class="attachedType" style="visibility:hidden"></span></a></li>
-
-  </ul>
-</li>
-<li>
   <a class="reference reference-toplevel" href="#12" id="62">Procs</a>
   <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#toNFD,T"
-    title="toNFD[T: seq[Rune] | string](cps: T): T"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#toNFC,T"
-    title="toNFC[T: seq[Rune] | string](cps: T): T"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#toNFKD,T"
-    title="toNFKD[T: seq[Rune] | string](cps: T): T"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#toNFKC,T"
-    title="toNFKC[T: seq[Rune] | string](cps: T): T"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#isNFC,"
-    title="isNFC(cps: (seq[Rune] | string)): bool"><wbr />is<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#isNFD,"
-    title="isNFD(cps: (seq[Rune] | string)): bool"><wbr />is<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#isNFKC,"
-    title="isNFKC(cps: (seq[Rune] | string)): bool"><wbr />is<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#isNFKD,"
-    title="isNFKD(cps: (seq[Rune] | string)): bool"><wbr />is<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+      <li><a class="reference" href="#toNFD,string"
+    title="toNFD(s: string): string"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFD,seq[Rune]"
+    title="toNFD(s: seq[Rune]): seq[Rune]"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFC,string"
+    title="toNFC(s: string): string"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFC,seq[Rune]"
+    title="toNFC(s: seq[Rune]): seq[Rune]"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKD,string"
+    title="toNFKD(s: string): string"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKD,seq[Rune]"
+    title="toNFKD(s: seq[Rune]): seq[Rune]"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKC,string"
+    title="toNFKC(s: string): string"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKC,seq[Rune]"
+    title="toNFKC(s: seq[Rune]): seq[Rune]"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFC,string"
+    title="isNFC(s: string): bool"><wbr />is<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFC,seq[Rune]"
+    title="isNFC(s: seq[Rune]): bool"><wbr />is<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFD,string"
+    title="isNFD(s: string): bool"><wbr />is<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFD,seq[Rune]"
+    title="isNFD(s: seq[Rune]): bool"><wbr />is<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFKC,string"
+    title="isNFKC(s: string): bool"><wbr />is<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFKC,seq[Rune]"
+    title="isNFKC(s: seq[Rune]): bool"><wbr />is<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFKD,string"
+    title="isNFKD(s: string): bool"><wbr />is<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#isNFKD,seq[Rune]"
+    title="isNFKD(s: seq[Rune]): bool"><wbr />is<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
 <li>
-  <a class="reference reference-toplevel" href="#14" id="64">Iterators</a>
+  <a class="reference reference-toplevel" href="#15" id="65">Iterators</a>
   <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#toNFD.i,IterRunes"
-    title="toNFD(cps: IterRunes): Rune"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden">IterRunes</span></a></li>
-  <li><a class="reference" href="#toNFC.i,IterRunes"
-    title="toNFC(cps: IterRunes): Rune"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden">IterRunes</span></a></li>
-  <li><a class="reference" href="#toNFKD.i,IterRunes"
-    title="toNFKD(cps: IterRunes): Rune"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden">IterRunes</span></a></li>
-  <li><a class="reference" href="#toNFKC.i,IterRunes"
-    title="toNFKC(cps: IterRunes): Rune"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden">IterRunes</span></a></li>
+      <li><a class="reference" href="#toNFD.i,string"
+    title="toNFD(s: string): Rune"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFD.i,seq[Rune]"
+    title="toNFD(s: seq[Rune]): Rune"><wbr />to<wbr />NFD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFC.i,string"
+    title="toNFC(s: string): Rune"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFC.i,seq[Rune]"
+    title="toNFC(s: seq[Rune]): Rune"><wbr />to<wbr />NFC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKD.i,string"
+    title="toNFKD(s: string): Rune"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKD.i,seq[Rune]"
+    title="toNFKD(s: seq[Rune]): Rune"><wbr />to<wbr />NFKD<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKC.i,string"
+    title="toNFKC(s: string): Rune"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#toNFKC.i,seq[Rune]"
+    title="toNFKC(s: seq[Rune]): Rune"><wbr />to<wbr />NFKC<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
@@ -1276,82 +1314,132 @@ function main() {
 <dl class="item">
 <a class="reference external" href="unicode.html">unicode</a>, <a class="reference external" href="unicodedb.html">unicodedb</a>
 </dl></div>
-<div class="section" id="7">
-<h1><a class="toc-backref" href="#7">Types</a></h1>
-<dl class="item">
-<dt id="IterRunes"><a name="IterRunes"></a><pre><span class="Identifier">IterRunes</span> <span class="Other">=</span> <span class="Other">(</span><span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Keyword">ref</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Other">(</span><span class="Keyword">iterator</span> <span class="Other">(</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span><span class="Other">)</span><span class="Other">)</span></pre></dt>
-<dd>
-
-
-</dd>
-
-</dl></div>
 <div class="section" id="12">
 <h1><a class="toc-backref" href="#12">Procs</a></h1>
 <dl class="item">
-<dt id="toNFD"><a name="toNFD,T"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFD</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dt id="toNFD"><a name="toNFD,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Return the normalized input
 
 </dd>
-<dt id="toNFC"><a name="toNFC,T"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFC</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dt id="toNFD"><a name="toNFD,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Return the normalized input
 
 </dd>
-<dt id="toNFKD"><a name="toNFKD,T"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKD</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dt id="toNFC"><a name="toNFC,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Return the normalized input
 
 </dd>
-<dt id="toNFKC"><a name="toNFKC,T"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKC</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dt id="toNFC"><a name="toNFC,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Return the normalized input
 
 </dd>
-<dt id="isNFC"><a name="isNFC,"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFC</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Other">(</span><span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFKD"><a name="toNFKD,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Return wheter the unicode characters are normalized or not
+Return the normalized input
 
 </dd>
-<dt id="isNFD"><a name="isNFD,"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFD</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Other">(</span><span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFKD"><a name="toNFKD,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Return wheter the unicode characters are normalized or not
+Return the normalized input
 
 </dd>
-<dt id="isNFKC"><a name="isNFKC,"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKC</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Other">(</span><span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFKC"><a name="toNFKC,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Return wheter the unicode characters are normalized or not
+Return the normalized input
 
 </dd>
-<dt id="isNFKD"><a name="isNFKD,"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKD</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Other">(</span><span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Operator">|</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFKC"><a name="toNFKC,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">toNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Return wheter the unicode characters are normalized or not
+Return the normalized input
+
+</dd>
+<dt id="isNFC"><a name="isNFC,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFC"><a name="isNFC,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFD"><a name="isNFD,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFD"><a name="isNFD,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFKC"><a name="isNFKC,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFKC"><a name="isNFKC,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFKD"><a name="isNFKD,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
+
+</dd>
+<dt id="isNFKD"><a name="isNFKD,seq[Rune]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Return whether the unicode characters are normalized or not
 
 </dd>
 
 </dl></div>
-<div class="section" id="14">
-<h1><a class="toc-backref" href="#14">Iterators</a></h1>
+<div class="section" id="15">
+<h1><a class="toc-backref" href="#15">Iterators</a></h1>
 <dl class="item">
-<dt id="toNFD"><a name="toNFD.i,IterRunes"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFD</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">IterRunes</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFD"><a name="toNFD.i,string"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Iterates over each normalized unicode character. Passing a ref or iterator will make this take O(1) space, otherwise the sequence gets copied once.
+Iterates over each normalized unicode character
 
 </dd>
-<dt id="toNFC"><a name="toNFC.i,IterRunes"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFC</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">IterRunes</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFD"><a name="toNFD.i,seq[Rune]"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Iterates over each normalized unicode character. Passing a ref or iterator will make this take O(1) space, otherwise the sequence gets copied once.
+Iterates over each normalized unicode character
 
 </dd>
-<dt id="toNFKD"><a name="toNFKD.i,IterRunes"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKD</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">IterRunes</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFC"><a name="toNFC.i,string"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Iterates over each normalized unicode character. Passing a ref or iterator will make this take O(1) space, otherwise the sequence gets copied once.
+Iterates over each normalized unicode character
 
 </dd>
-<dt id="toNFKC"><a name="toNFKC.i,IterRunes"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKC</span><span class="Other">(</span><span class="Identifier">cps</span><span class="Other">:</span> <span class="Identifier">IterRunes</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="toNFC"><a name="toNFC.i,seq[Rune]"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-Iterates over each normalized unicode character. Passing a ref or iterator will make this take O(1) space, otherwise the sequence gets copied once.
+Iterates over each normalized unicode character
+
+</dd>
+<dt id="toNFKD"><a name="toNFKD.i,string"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Iterates over each normalized unicode character
+
+</dd>
+<dt id="toNFKD"><a name="toNFKD.i,seq[Rune]"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKD</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Iterates over each normalized unicode character
+
+</dd>
+<dt id="toNFKC"><a name="toNFKC.i,string"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Iterates over each normalized unicode character
+
+</dd>
+<dt id="toNFKC"><a name="toNFKC.i,seq[Rune]"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">toNFKC</span><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">Rune</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Rune</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">inline</span><span class="Other">,</span> <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Iterates over each normalized unicode character
 
 </dd>
 
@@ -1364,7 +1452,7 @@ Iterates over each normalized unicode character. Passing a ref or iterator will 
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-11-27 03:24:26 UTC</small>
+        <small>Made with Nim. Generated: 2018-03-16 02:32:20 UTC</small>
       </div>
     </div>
   </div>
