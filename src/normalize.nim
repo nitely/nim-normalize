@@ -27,9 +27,9 @@ type
     ## the last index in use
     data: array[32, int]  # todo: int -> int32 or Rune
     pt: int
-  UnBuffer = seq[int]
+  UnBuffer = seq[int]  # todo: remove
     ## For testing purposes
-  SomeBuffer = (Buffer | UnBuffer)
+  SomeBuffer = (Buffer | UnBuffer)  # todo: remove
 
 iterator items(buffer: Buffer): int {.inline.} =
   var i = 0

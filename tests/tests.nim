@@ -185,14 +185,3 @@ test "Test is NFD":
   check(not isNFD(@[Rune(0x1E0A)]))
   check isNFD(toNFD(@[Rune(0x1E0A)]))
   check isNFD("abc")
-
-#[
-test "Test it does not blow the buffer":
-  var text = @[Rune(0x0041)]
-  for i in 0 ..< 31:
-    text.add(Rune(0x0300))
-  var i = 0
-  for cp in toNFC(text):
-    inc i
-  check i == 32
-]#
