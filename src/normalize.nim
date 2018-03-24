@@ -664,3 +664,14 @@ when isMainModule:
     for _ in toNFC(text):
       inc i
     doAssert i == text.len + 1  # + joiner char
+  block:
+    echo "Test idempotency"
+    var buff: Buffer
+    doAssert buff.data.len > 0
+    var text = newSeq[Rune]()
+    for i in 0 .. buff.data.len:
+      text.add(Rune(0x0300))
+    doAssert(toNFC(text) == toNFC(toNFC(text)))
+    doAssert(toNFKC(text) == toNFKC(toNFKC(text)))
+    doAssert(toNFD(text) == toNFD(toNFD(text)))
+    doAssert(toNFKD(text) == toNFKD(toNFKD(text)))

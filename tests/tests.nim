@@ -185,3 +185,10 @@ test "Test is NFD":
   check(not isNFD(@[Rune(0x1E0A)]))
   check isNFD(toNFD(@[Rune(0x1E0A)]))
   check isNFD("abc")
+
+test "Test idempotency":
+  for record in testData:
+    check toNFD(record.source) == toNFD(toNFD(record.source))
+    check toNFKD(record.source) == toNFKD(toNFKD(record.source))
+    check toNFC(record.source) == toNFC(toNFC(record.source))
+    check toNFKC(record.source) == toNFKC(toNFKC(record.source))
