@@ -66,9 +66,11 @@ proc setLen(buffer: var Buffer, i: int) {.inline.} =
   buffer.pt = i
 
 proc `[]`(buffer: var Buffer, i: int): var int {.inline.} =
+  assert i < buffer.pt
   buffer.data[i]
 
 proc `[]=`(buffer: var Buffer, i: int, x: int) {.inline.} =
+  assert i < buffer.pt
   buffer.data[i] = x
 
 proc reverse(buffer: var Buffer) {.inline.} =
@@ -80,7 +82,7 @@ proc reverse(buffer: var Buffer) {.inline.} =
     inc(x)
 
 proc pop(buffer: var Buffer): int {.inline.} =
-  assert buffer.len - 1 >= 0
+  assert buffer.len-1 >= 0
   result = buffer.data[buffer.len - 1]
   dec buffer.pt
 
@@ -560,93 +562,91 @@ proc isNFKD*(s: seq[Rune]): bool {.inline.} =
   ## are normalized or not
   isNF(s, NfType.NFKD) == QcStatus.YES
 
-proc cmpNfd*(a, b: seq[Rune]): bool =
-  # todo: WIP!
+proc cmpNfd*(a, b: string): bool =
+  ## Compare two strings
+  ## are canonically equivalent.
+  ## This is more efficient than
+  ## normalizing + comparing, as it
+  ## does not create temporary strings
+  ## (i.e it won't allocate).
+  template fillBuffer(
+      s: string,
+      ni, di: var int,
+      r: var Rune,
+      buff, cccs, dcps: var Buffer,
+      cp, ccc: var int,
+      compare: var bool) =
+    ## This is meant to be called and
+    ## resumed later with a partially
+    ## consumed "decomposed rune"
+    assert ni <= len(s)
+    assert di <= len(dcps)
+    compare = false
+    while ni < len(s) or di < len(dcps):
+      if di == len(dcps):
+        di = 0
+        fastRuneAt(s, ni, r, true)
+        decompose(dcps, r.int, NfType.NFD)
+      while di < len(dcps):
+        cp = dcps[di]
+        let props = properties(cp)
+        ccc = combining(props)
+        let
+          qc = quickCheck(props)
+          isSafeBreak = (
+            isAllowed(qc, NfType.NFD) == QcStatus.YES and
+            ccc == 0)
+          finished = ni == len(s) and di == high(dcps)
+        if not finished and (isSafeBreak or buff.left == 1):
+          compare = true
+          break
+        buff.add(cp)
+        cccs.add(ccc)
+        inc di
+      if compare:
+        break
+  result = true
   var
     cpa, cpb: int
     ccca, cccb: int
     ra, rb: Rune
-    na, nb = 0
+    nia, nib = 0
+    dia, dib = 0
     buffa, cccsa, dcpsa: Buffer
     buffb, cccsb, dcpsb: Buffer
-    i, j = 0
     compare = false
   while (
-      na < len(a) or i < len(dcpsa) or
-      nb < len(b) or j < len(dcpsb)):
-    compare = false
-    while (na < len(a) or i < len(dcpsa)) and not compare:
-      if i == len(dcpsa):
-        i = 0
-        #fastRuneAt(a, na, ra, true)
-        ra = a[na]
-        inc na
-        decompose(dcpsa, ra.int, NfType.NFD)
-      while i < len(dcpsa):
-        cpa = dcpsa[i]
-        let
-          props = properties(cpa)
-          ccc = combining(props)
-          qc = quickCheck(props)
-          isSafeBreak = (
-            isAllowed(qc, NfType.NFD) == QcStatus.YES and
-            ccc == 0)
-        ccca = ccc
-        if isSafeBreak or buffa.left == 1:
-          compare = true
-          break
-        buffa.add(cpa)
-        cccsa.add(ccca)
-        inc i
-    compare = false
-    while (nb < len(b) or j < len(dcpsb)) and not compare:
-      if j == len(dcpsb):
-        j = 0
-        #fastRuneAt(b, nb, rb, true)
-        rb = b[nb]
-        inc nb
-        decompose(dcpsb, rb.int, NfType.NFD)
-      while j < len(dcpsb):
-        cpb = dcpsb[j]
-        let
-          props = properties(cpb)
-          ccc = combining(props)
-          qc = quickCheck(props)
-          isSafeBreak = (
-            isAllowed(qc, NfType.NFD) == QcStatus.YES and
-            ccc == 0)
-        cccb = ccc
-        if isSafeBreak or buffb.left == 1:
-          compare = true
-          break
-        buffb.add(cpb)
-        cccsb.add(cccb)
-        inc j
+      nia < len(a) or dia < len(dcpsa) or
+      nib < len(b) or dib < len(dcpsb)):
+    fillBuffer(a, nia, dia, ra, buffa, cccsa, dcpsa, cpa, ccca, compare)
+    fillBuffer(b, nib, dib, rb, buffb, cccsb, dcpsb, cpb, cccb, compare)
     buffa.canonicSort(cccsa)
     buffb.canonicSort(cccsb)
     result = buffa == buffb
     if not result:
       return
-    buffa.clear
-    buffb.clear
-    cccsa.clear
-    cccsb.clear
-    if na < len(a) or i < len(dcpsa):
+    buffa.clear()
+    buffb.clear()
+    cccsa.clear()
+    cccsb.clear()
+    if nia < len(a) or dia < len(dcpsa):
       buffa.add(cpa)
       cccsa.add(ccca)
-      inc i
-    if nb < len(b) or j < len(dcpsb):
+      inc dia
+    if nib < len(b) or dib < len(dcpsb):
       buffb.add(cpb)
       cccsb.add(cccb)
-      inc j
+      inc dib
 
 when isMainModule:
   block:
     echo "Test random text"
-    var text: seq[Rune] = @[]
+    var
+      text = newSeq[Rune]()
+      text2 = ""
     for line in lines("./tests/TestNormRandomText.txt"):
-      for r in runes(line):
-        text.add(r)
+      text.add(line.toRunes)
+      text2.add(line)
     doAssert toNFUnbuffered(text, NfType.NFD) == toNFD(text)
     doAssert toNFUnbuffered(text, NfType.NFC) == toNFC(text)
     doAssert toNFUnbuffered(text, NfType.NFKC) == toNFKC(text)
@@ -656,6 +656,16 @@ when isMainModule:
     doAssert isNFC(toNFC(text))
     doAssert isNFKC(toNFKC(text))
     doAssert isNFKD(toNFKD(text))
+    doAssert isNFD(toNFD(text2))
+    doAssert isNFC(toNFC(text2))
+    doAssert isNFKC(toNFKC(text2))
+    doAssert isNFKD(toNFKD(text2))
+
+    doAssert cmpNfd(toNfd(text2), toNfd(text2))
+    doAssert cmpNfd(toNfc(text2), toNfc(text2))
+    doAssert cmpNfd(toNfc(text2), toNfd(text2))
+    doAssert cmpNfd(text2, toNfd(text2))
+    doAssert cmpNfd(text2, toNfc(text2))
     echo "Tested: " & $text.len & " chars"
 
   echo "Test Buffer"

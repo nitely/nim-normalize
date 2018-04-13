@@ -193,13 +193,34 @@ test "Test idempotency":
     check toNFC(record.source) == toNFC(toNFC(record.source))
     check toNFKC(record.source) == toNFKC(toNFKC(record.source))
 
+proc toUTF8(s: seq[Rune]): string =
+  result = ""
+  for r in s:
+    result.add(r.toUTF8)
+
 test "Test cmpNFD":
   var i = 0
   for record in testData:
-    check cmpNFD(record.nfd, record.source)
-    check cmpNFD(record.nfd, record.nfc)
-    check cmpNFD(record.nfd, record.nfd)
-    check cmpNFD(record.nfkd, record.nfkc)
-    check cmpNFD(record.nfkd, record.nfkd)
+    check cmpNFD(record.nfd.toUTF8, record.source.toUTF8)
+    check cmpNFD(record.nfd.toUTF8, record.nfc.toUTF8)
+    check cmpNFD(record.nfd.toUTF8, record.nfd.toUTF8)
+    check cmpNFD(record.nfkd.toUTF8, record.nfkc.toUTF8)
+    check cmpNFD(record.nfkd.toUTF8, record.nfkd.toUTF8)
     inc i
   echo "tested $# records" % $i
+
+test "Test some cmpNFD":
+  check cmpNfd("", "")
+  check cmpNfd("a", "a")
+  check cmpNfd(
+    "Voulez-vous un caf\u00E9?",
+    "Voulez-vous un caf\u0065\u0301?")
+  check(not cmpNfd("\u0041", "\u0410"))
+  check(not cmpNfd("a", "b"))
+  check(not cmpNfd("abc", "abd"))
+  check(not cmpNfd("cba", "dba"))
+  check(not cmpNfd("a", ""))
+  check(not cmpNfd("", "a"))
+  check(not cmpNfd("a", "aa"))
+  check(not cmpNfd("aa", "a"))
+  check(not cmpNfd("\u00E9-a", "\u0065\u0301-b"))
