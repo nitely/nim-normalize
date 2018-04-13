@@ -192,3 +192,14 @@ test "Test idempotency":
     check toNFKD(record.source) == toNFKD(toNFKD(record.source))
     check toNFC(record.source) == toNFC(toNFC(record.source))
     check toNFKC(record.source) == toNFKC(toNFKC(record.source))
+
+test "Test cmpNFD":
+  var i = 0
+  for record in testData:
+    check cmpNFD(record.nfd, record.source)
+    check cmpNFD(record.nfd, record.nfc)
+    check cmpNFD(record.nfd, record.nfd)
+    check cmpNFD(record.nfkd, record.nfkc)
+    check cmpNFD(record.nfkd, record.nfkd)
+    inc i
+  echo "tested $# records" % $i

@@ -1,3 +1,10 @@
+v0.2.1
+==================
+
+* `cmpNfd` API
+* Fix: wrong normalization when the text is malformed
+  (i.e when a `graphemeJoiner` is inserted)
+
 v0.2.0
 ==================
 

@@ -21,7 +21,7 @@ import unicode
 import unicodedb
 
 type
-  Buffer = tuple
+  Buffer = object
     ## A buffer has a fixed size but works
     ## as if it were dynamic by tracking
     ## the last index in use
@@ -83,6 +83,18 @@ proc pop(buffer: var Buffer): int {.inline.} =
   assert buffer.len - 1 >= 0
   result = buffer.data[buffer.len - 1]
   dec buffer.pt
+
+proc `==`(a, b: Buffer): bool =
+  # todo: memcmp
+  result = len(a) == len(b)
+  if not result:
+    return
+  var i = 0
+  while i < len(a):
+    result = a.data[i] == b.data[i]
+    if not result:
+      return
+    inc i
 
 type
   NfType {.pure.} = enum
@@ -220,6 +232,7 @@ proc canonicSort(cps, cccs: var SomeBuffer) =
   # * Reorderable pair: Two adjacent characters A and B in a
   #   coded character sequence <A, B> are a Reorderable Pair
   #   if and only if ccc(A) > ccc(B) > 0.
+  assert len(cps) == len(cccs)
   var
     i = cps.len - 1
     isSwapped = false
@@ -327,9 +340,7 @@ iterator toNF(
     nfType: static[NfType]): Rune {.inline.} =
   ## Buffered unicode normalization
   var
-    buff: Buffer
-    cccs: Buffer
-    dcps: Buffer
+    buff, cccs, dcps: Buffer
     lastCCC = 0
   for done, r in runesN(s):
     decompose(dcps, r.int, nfType)
@@ -357,6 +368,7 @@ iterator toNF(
         # Put a CGJ beetwen non-starters
         if lastCCC != 0 and ccc != 0:
           buff.add(graphemeJoiner)
+          cccs.add(0)
       lastCCC = ccc
       buff.add(cp)
       cccs.add(ccc)
@@ -447,7 +459,9 @@ proc toNFKC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input
   toNF(s, NfType.NFKC)
 
-proc toNFUnbuffered(cps: seq[Rune], nfType: static[NfType]): seq[Rune] =
+proc toNFUnbuffered(
+    cps: seq[Rune],
+    nfType: static[NfType]): seq[Rune] {.used.} =
   ## This exists for testing purposes
   let isComposable = nfType in [NfType.NFC, NfType.NFKC]
   var
@@ -545,6 +559,86 @@ proc isNFKD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not
   isNF(s, NfType.NFKD) == QcStatus.YES
+
+proc cmpNfd*(a, b: seq[Rune]): bool =
+  # todo: WIP!
+  var
+    cpa, cpb: int
+    ccca, cccb: int
+    ra, rb: Rune
+    na, nb = 0
+    buffa, cccsa, dcpsa: Buffer
+    buffb, cccsb, dcpsb: Buffer
+    i, j = 0
+    compare = false
+  while (
+      na < len(a) or i < len(dcpsa) or
+      nb < len(b) or j < len(dcpsb)):
+    compare = false
+    while (na < len(a) or i < len(dcpsa)) and not compare:
+      if i == len(dcpsa):
+        i = 0
+        #fastRuneAt(a, na, ra, true)
+        ra = a[na]
+        inc na
+        decompose(dcpsa, ra.int, NfType.NFD)
+      while i < len(dcpsa):
+        cpa = dcpsa[i]
+        let
+          props = properties(cpa)
+          ccc = combining(props)
+          qc = quickCheck(props)
+          isSafeBreak = (
+            isAllowed(qc, NfType.NFD) == QcStatus.YES and
+            ccc == 0)
+        ccca = ccc
+        if isSafeBreak or buffa.left == 1:
+          compare = true
+          break
+        buffa.add(cpa)
+        cccsa.add(ccca)
+        inc i
+    compare = false
+    while (nb < len(b) or j < len(dcpsb)) and not compare:
+      if j == len(dcpsb):
+        j = 0
+        #fastRuneAt(b, nb, rb, true)
+        rb = b[nb]
+        inc nb
+        decompose(dcpsb, rb.int, NfType.NFD)
+      while j < len(dcpsb):
+        cpb = dcpsb[j]
+        let
+          props = properties(cpb)
+          ccc = combining(props)
+          qc = quickCheck(props)
+          isSafeBreak = (
+            isAllowed(qc, NfType.NFD) == QcStatus.YES and
+            ccc == 0)
+        cccb = ccc
+        if isSafeBreak or buffb.left == 1:
+          compare = true
+          break
+        buffb.add(cpb)
+        cccsb.add(cccb)
+        inc j
+    buffa.canonicSort(cccsa)
+    buffb.canonicSort(cccsb)
+    result = buffa == buffb
+    if not result:
+      return
+    buffa.clear
+    buffb.clear
+    cccsa.clear
+    cccsb.clear
+    if na < len(a) or i < len(dcpsa):
+      buffa.add(cpa)
+      cccsa.add(ccca)
+      inc i
+    if nb < len(b) or j < len(dcpsb):
+      buffb.add(cpb)
+      cccsb.add(cccb)
+      inc j
 
 when isMainModule:
   block:
