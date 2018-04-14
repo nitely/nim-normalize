@@ -496,7 +496,9 @@ iterator runes(s: seq[Rune]): Rune {.inline.} =
 
 proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
   ## This may return a Maybe
-  ## result for normalized strings
+  ## result, even if the string
+  ## is perfectly normalized.
+  ## Result ain't always Yes or No
   result = QcStatus.YES
   var
     lastCanonicalClass = 0
@@ -525,49 +527,49 @@ proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
 proc isNFC*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFC) == QcStatus.YES
 
 proc isNFC*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFC) == QcStatus.YES
 
 proc isNFD*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFD) == QcStatus.YES
 
 proc isNFD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFD) == QcStatus.YES
 
 proc isNFKC*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFKC) == QcStatus.YES
 
 proc isNFKC*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFKC) == QcStatus.YES
 
 proc isNFKD*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFKD) == QcStatus.YES
 
 proc isNFKD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
-  ## the result is always false (even if it's normalized)
+  ## the result is always ``false`` (even if it's normalized)
   isNF(s, NfType.NFKD) == QcStatus.YES
 
 # todo: cmpNfkd for compat cmp
