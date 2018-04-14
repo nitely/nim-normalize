@@ -4,6 +4,7 @@ v0.2.1
 * New: `cmpNfd` API
 * Fix: wrong normalization when the text is malformed
   (i.e when a `graphemeJoiner` is inserted)
+* Improve perf of `toNfx` functions
 
 v0.2.0
 ==================
