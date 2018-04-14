@@ -416,15 +416,30 @@ iterator toNFKC*(s: seq[Rune]): Rune {.inline.} =
     yield r
 
 proc toNF(s: seq[Rune], nfType: static[NfType]): seq[Rune] =
-  result = newSeqOfCap[Rune](len(s))
+  # the grow factor used to be
+  # passed by every Nf. But
+  # now we just grow it when needed.
+  # Nf's grow factors
+  # are 3x (NFC), 4x (NFD)
+  # and 18x (NFKC/NFKD), so growing
+  # by 2x seems best
+  result = newSeq[Rune](len(s))
+  var i = 0
   for r in toNF(s, nfType):
-    result.add(r)
+    if i > result.high:
+      result.setLen(result.len*2)
+    result[i] = r
+    inc i
+  result.setLen(i)
 
 proc toNF(s: string, nfType: static[NfType]): string =
-  result = newStringOfCap(len(s))
+  result = newString(len(s))
+  var i = 0
   for r in toNF(s, nfType):
-    # todo: avoid temporay string
-    result.add(r.toUTF8)
+    if i >= result.high:
+      result.setLen(result.len*2)
+    fastToUTF8Copy(r, result, i, true)
+  result.setLen(i)
 
 proc toNFD*(s: string): string =
   ## Return the normalized input.

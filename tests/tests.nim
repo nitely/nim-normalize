@@ -217,6 +217,25 @@ test "Test it adds a grapheme joiner":
       inc i
   check i == 1  # Make sure it's just 1
 
+test "Test expansion factor":
+  # from http://unicode.org/faq/normalization.html
+  check(
+    len(toNfc(0x1D160.Rune.toUTF8)) ==
+    len(0x1D160.Rune.toUTF8) * 3)
+  check(len(toNfc(@[0xFB2C.Rune])) == 3)
+  check(
+    len(toNfd(0x0390.Rune.toUTF8)) ==
+    len(0x0390.Rune.toUTF8) * 3)
+  check(len(toNfd(@[0x1F82.Rune])) == 4)
+  check(
+    len(toNfkc(0xFDFA.Rune.toUTF8)) ==
+    len(0xFDFA.Rune.toUTF8) * 11)
+  check(len(toNfkc(@[0xFDFA.Rune])) == 18)
+  check(
+    len(toNfkd(0xFDFA.Rune.toUTF8)) ==
+    len(0xFDFA.Rune.toUTF8) * 11)
+  check(len(toNfkd(@[0xFDFA.Rune])) == 18)
+
 test "Test it does not add a grapheme joiner":
   var text = @[Rune(0x0041)]
   for i in 0 .. 40:
