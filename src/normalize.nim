@@ -562,6 +562,7 @@ proc isNFKD*(s: seq[Rune]): bool {.inline.} =
   ## are normalized or not
   isNF(s, NfType.NFKD) == QcStatus.YES
 
+# todo: cmpNfkd for compat cmp
 proc cmpNfd*(a, b: string): bool =
   ## Compare two strings
   ## are canonically equivalent.
@@ -607,11 +608,9 @@ proc cmpNfd*(a, b: string): bool =
         break
   result = true
   var
-    cpa, cpb: int
-    ccca, cccb: int
+    cpa, cpb, ccca, cccb: int
     ra, rb: Rune
-    nia, nib = 0
-    dia, dib = 0
+    nia, nib, dia, dib = 0
     buffa, cccsa, dcpsa: Buffer
     buffb, cccsb, dcpsb: Buffer
     compare = false
