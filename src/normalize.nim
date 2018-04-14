@@ -442,7 +442,7 @@ proc toNFC*(s: string): string =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFC3)
+  toNF(s, NfType.NFC)
 
 proc toNFC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.

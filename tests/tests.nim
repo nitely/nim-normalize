@@ -223,14 +223,6 @@ test "Test it does not add a grapheme joiner":
     text.add(Rune(0x0041))
   check(Rune(0x034F) notin toNFC(text))
 
-test "Test expansion factors":
-  echo len("𝅘𝅥𝅮")
-  echo len(toNFC("𝅘𝅥𝅮"))
-  echo len("𝅘𝅥𝅮".toRunes)
-  echo len(toNFC("𝅘𝅥𝅮".toRunes))
-  #check(len(toNFC("𝅘𝅥𝅮")) == len("𝅘𝅥𝅮")*3)
-  #check(len(toNFC("𝅘𝅥𝅮".toRunes)) == len("𝅘𝅥𝅮".toRunes)*3)
-
 test "Test is NFC":
   check(not isNFC(@[Rune(0x1E0A), Rune(0x0323)]))
   check(not isNFC(toNFC(@[Rune(0x1E0C), Rune(0x0307)])))  # Maybe
