@@ -27,6 +27,11 @@ assert toNfd("\u00C8") == "\u0045\u0300"
 assert cmpNfd(
   "Voulez-vous un caf\u00E9?",
   "Voulez-vous un caf\u0065\u0301?")
+
+# Normalization check
+assert isNFD(toNFD("\u1E0A"))
+
+# isNfc, isNfkc and isNfkd are also available
 ```
 
 > Note: when printing to a terminal,
