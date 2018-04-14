@@ -20,24 +20,28 @@ import unicode
 
 import unicodedb
 
+# A Rune is a distinct int32. Well, not anymore...
+converter toInt32(x: Rune): int32 = x.int32
+converter toRune(x: int32): Rune = x.Rune
+
 type
   Buffer = object
     ## A buffer has a fixed size but works
     ## as if it were dynamic by tracking
     ## the last index in use
-    data: array[32, int]  # todo: int -> int32 or Rune
-    pt: int
-  UnBuffer = seq[int]  # todo: remove
+    data: array[32, int32]
+    pos: int
+  UnBuffer = seq[int32]
     ## For testing purposes
-  SomeBuffer = (Buffer | UnBuffer)  # todo: remove
+  SomeBuffer = Buffer or UnBuffer
 
-iterator items(buffer: Buffer): int {.inline.} =
+iterator items(buffer: Buffer): int32 {.inline.} =
   var i = 0
-  while i < buffer.pt:
+  while i < buffer.pos:
     yield buffer.data[i]
     inc i
 
-iterator pairs(buffer: Buffer): (int, int) {.inline.} =
+iterator pairs(buffer: Buffer): (int, int32) {.inline.} =
   var i = 0
   for n in buffer:
     yield (i, n)
@@ -45,32 +49,32 @@ iterator pairs(buffer: Buffer): (int, int) {.inline.} =
 
 proc left(buffer: Buffer): int {.inline.} =
   ## return capacity left
-  buffer.data.len - buffer.pt
+  buffer.data.len - buffer.pos
 
 proc clear(buffer: var Buffer) {.inline.} =
-  buffer.pt = 0
+  buffer.pos = 0
 
-proc add(buffer: var Buffer, elm: int) {.inline.} =
+proc add(buffer: var Buffer, x: int32) {.inline.} =
   assert buffer.left > 0
-  buffer.data[buffer.pt] = elm
-  inc buffer.pt
+  buffer.data[buffer.pos] = x
+  inc buffer.pos
 
 proc len(buffer: Buffer): int {.inline.} =
-  buffer.pt
+  buffer.pos
 
 proc high(buffer: Buffer): int {.inline.} =
-  buffer.pt - 1
+  buffer.pos - 1
 
 proc setLen(buffer: var Buffer, i: int) {.inline.} =
   assert i <= buffer.data.len
-  buffer.pt = i
+  buffer.pos = i
 
-proc `[]`(buffer: var Buffer, i: int): var int {.inline.} =
-  assert i < buffer.pt
+proc `[]`(buffer: var Buffer, i: int): var int32 {.inline.} =
+  assert i < buffer.pos
   buffer.data[i]
 
-proc `[]=`(buffer: var Buffer, i: int, x: int) {.inline.} =
-  assert i < buffer.pt
+proc `[]=`(buffer: var Buffer, i: int, x: int32) {.inline.} =
+  assert i < buffer.pos
   buffer.data[i] = x
 
 proc reverse(buffer: var Buffer) {.inline.} =
@@ -81,10 +85,10 @@ proc reverse(buffer: var Buffer) {.inline.} =
     dec(y)
     inc(x)
 
-proc pop(buffer: var Buffer): int {.inline.} =
+proc pop(buffer: var Buffer): int32 {.inline.} =
   assert buffer.len-1 >= 0
   result = buffer.data[buffer.len - 1]
-  dec buffer.pt
+  dec buffer.pos
 
 proc `==`(a, b: Buffer): bool =
   # todo: memcmp
@@ -123,44 +127,44 @@ proc isAllowed(qc: int, nfType: NfType): QcStatus {.inline.} =
       result = status
       return
 
-proc primaryComposite(cpA: int, cpB: int): int {.inline.} =
+proc primaryComposite(rA: Rune, rB: Rune): Rune {.inline.} =
   ## Find the composition of two decomposed CPs
   # This does not include hangul chars
   # as those can be dynamically computed
-  composition(cpA, cpB)
+  # todo: pass runes and implement a non raisy API
+  composition(rA.int, rB.int).int32
 
 # Hangul
 const
-  SBase = 0xAC00
-  LBase = 0x1100
-  VBase = 0x1161
-  TBase = 0x11A7
-  LCount = 19
-  VCount = 21
-  TCount = 28
+  SBase = 0xAC00'i32
+  LBase = 0x1100'i32
+  VBase = 0x1161'i32
+  TBase = 0x11A7'i32
+  LCount = 19'i32
+  VCount = 21'i32
+  TCount = 28'i32
   NCount = VCount * TCount
   SCount = LCount * NCount
 
-proc hangulComposition(cpA: int, cpB: int): int =
-  ## Return hangul composition. Return -1 if not found
+proc hangulComposition(rA: Rune, rB: Rune): Rune =
+  ## Return hangul composition.
+  ## Return -1 if not found
   let
-    LIndex = cpA - LBase
-    VIndex = cpB - VBase
+    LIndex = rA - LBase
+    VIndex = rB - VBase
   if 0 <= LIndex and LIndex < LCount and
       0 <= VIndex and VIndex < VCount:
     result = SBase + (LIndex * VCount + VIndex) * TCount
     return
-
   let
-    SIndex = cpA - SBase
-    TIndex = cpB - TBase
+    SIndex = rA - SBase
+    TIndex = rB - TBase
   if 0 <= SIndex and SIndex < SCount and
       (SIndex mod TCount) == 0 and
       0 < TIndex and TIndex < TCount:
-    result = cpA + TIndex
+    result = rA + TIndex
     return
-
-  result = -1
+  result = -1'i32
 
 proc canonicalComposition(cps: var SomeBuffer) =
   ## In-place composition
@@ -173,55 +177,49 @@ proc canonicalComposition(cps: var SomeBuffer) =
   var
     lastStarterIdx = -1
     lastCCC = -1
-    pt = 0
+    pos = 0
   for cp in cps:
+    # Hangul composition
     if lastStarterIdx != -1 and
-        lastStarterIdx + 1 == pt:  # At head
+        lastStarterIdx + 1 == pos:  # At head
       let cpc = hangulComposition(cps[lastStarterIdx], cp)
       if cpc != -1:
         cps[lastStarterIdx] = cpc
         lastCCC = 0
         continue
-    # else not Hangul composition
-
     # Starter can be non-assigned
     let ccc = combining(cp)
     if lastStarterIdx == -1:
       if ccc == 0:
-        lastStarterIdx = pt
+        lastStarterIdx = pos
       lastCCC = ccc
-      cps[pt] = cp
-      inc pt
+      cps[pos] = cp
+      inc pos
       continue
-
     # Because the string is in canonical order,
     # testing whether a character is blocked requires
     # looking only at the immediately preceding char
     if lastCCC >= ccc and lastCCC > 0:
       lastCCC = ccc
-      cps[pt] = cp
-      inc pt
+      cps[pos] = cp
+      inc pos
       continue
-    # else not blocked
-
     let pcp = primaryComposite(cps[lastStarterIdx], cp)
     if pcp != -1:
       cps[lastStarterIdx] = pcp
       assert combining(pcp) == 0
       lastCCC = 0
       continue
-
     if ccc == 0:
-      lastStarterIdx = pt
+      lastStarterIdx = pos
       lastCCC = 0
-      cps[pt] = cp
-      inc pt
+      cps[pos] = cp
+      inc pos
       continue
-
     lastCCC = ccc
-    cps[pt] = cp
-    inc pt
-  cps.setLen(pt)
+    cps[pos] = cp
+    inc pos
+  cps.setLen(pos)
 
 proc canonicSort(cps, cccs: var SomeBuffer) =
   ## In-place canonical sort
@@ -249,10 +247,10 @@ proc canonicSort(cps, cccs: var SomeBuffer) =
         swap(cccs[j], cccs[j + 1])
         isSwapped = true
     if not isSwapped:
-      break
+      return
     dec i
 
-proc hangulDecomposition(cp: int): Buffer =
+proc hangulDecomposition(cp: int32): Buffer =
   let SIndex = cp - SBase
   if 0 > SIndex and SIndex >= SCount:
     return
@@ -264,66 +262,65 @@ proc hangulDecomposition(cp: int): Buffer =
   if T != TBase:
     result.add(T)
 
-proc isHangul(cp: int): bool {.inline.} =
-  0xAC00 <= cp and cp <= 0xD7A3
+proc isHangul(r: Rune): bool {.inline.} =
+  0xAC00 <= r and r <= 0xD7A3
 
 # NFD
 # NFC (+ canonic_composition later)
-proc canonicalDcp(cp: int): Buffer =
+proc canonicalDcp(r: Rune): Buffer =
   ## Return 4 code points at most.
   ## It does a full canonical decomposition
-  if cp.isHangul:
-    result = hangulDecomposition(cp)
+  if r.isHangul:
+    result = hangulDecomposition(r)
     if result.len == 0:
-      result.add(cp)
+      result.add(r)
     return
-
   var
-    cpA = cp
+    rA = r
     i = 0
   while true:
     i = 0
-    for cpX in canonicalDecomposition(cpA):
+    for rX in canonicalDecomposition(rA.Rune):
       if i == 0:
-        cpA = cpX
+        rA = rX
       else:
-        result.add(cpX)
+        result.add(rX)
       inc i
     if i == 0:
-      result.add(cpA)
+      result.add(rA)
       break
   result.reverse()
 
 # NFKD
 # NFKC (+ canonicalComposition later)
-proc compatibilityDecomposition(cp: int): Buffer =
+proc compatibilityDecomposition(r: Rune): Buffer =
   ## Return 18 code points at most.
   ## It does a full decomposition
-  if cp.isHangul:
-    result = hangulDecomposition(cp)
+  if r.isHangul:
+    result = hangulDecomposition(r)
     if result.len == 0:
-      result.add(cp)
+      result.add(r)
     return
 
   var queue: Buffer
-  queue.add(cp)
+  queue.add(r)
   while queue.len > 0:
     let
       curCp = queue.pop()
       lastLen = queue.len
-    for dcp in decomposition(curCp):
+    for dcp in decomposition(curCp.Rune):
       queue.add(dcp)
     if lastLen == queue.len:  # No decomposition
       result.add(curCp)
   result.reverse()
 
-const graphemeJoiner = 0x034F
+const graphemeJoiner = 0x034F.Rune
 
-template decompose(result, cp, nfType) =
+template decompose(result, r, nfType) =
   when nfType in {NfType.NFC, NfType.NFD}:
-    result = canonicalDcp(cp)
+    result = canonicalDcp(r)
   else:
-    result = compatibilityDecomposition(cp)
+    result = compatibilityDecomposition(r)
 
 iterator runesN(s: string): (bool, Rune) {.inline.} =
   var
@@ -345,12 +342,12 @@ iterator toNF(
     buff, cccs, dcps: Buffer
     lastCCC = 0
   for done, r in runesN(s):
-    decompose(dcps, r.int, nfType)
-    for j, cp in pairs(dcps):
+    decompose(dcps, r, nfType)
+    for i, cp in pairs(dcps):
       let
-        finished = done and j == dcps.high
+        finished = done and i == dcps.high
         props = properties(cp)
-        ccc = combining(props)
+        ccc = combining(props).int32  # todo: return i8?
         qc = quickCheck(props)
         isSafeBreak = (
           isAllowed(qc, nfType) == QcStatus.YES and
@@ -495,14 +492,14 @@ proc toNFUnbuffered(
   ## This exists for testing purposes
   let isComposable = nfType in [NfType.NFC, NfType.NFKC]
   var
-    cpsB = newSeqOfCap[int](result.len)
-    cccs = newSeqOfCap[int](result.len)
+    cpsB = newSeqOfCap[int32](result.len)
+    cccs = newSeqOfCap[int32](result.len)
     dcps: Buffer
   for rune in cps:
-    decompose(dcps, rune.int, nfType)
+    decompose(dcps, rune, nfType)
     for dcp in dcps:
       cpsB.add(dcp)
-      cccs.add(combining(dcp))
+      cccs.add(combining(dcp).int32)
   cpsB.canonicSort(cccs)
   if isComposable:
     cpsB.canonicalComposition()
@@ -510,12 +507,12 @@ proc toNFUnbuffered(
   for i, cp in cpsB:
     result[i] = Rune(cp)
 
-proc isSupplementary(cp: int): bool {.inline.} =
+proc isSupplementary(r: Rune): bool {.inline.} =
   ## Check a given code point is within a private area
   # Private areas
   result = (
-    (0x100000 <= cp and cp <= 0x10FFFD) or
-    (0xF0000 <= cp and cp <= 0xFFFFF))
+    (0x100000 <= r and r <= 0x10FFFD) or
+    (0xF0000 <= r and r <= 0xFFFFF))
 
 iterator runes(s: seq[Rune]): Rune {.inline.} =
   # no-op
@@ -531,15 +528,14 @@ proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
   var
     lastCanonicalClass = 0
     skipOne = false
-  for rune in runes(cps):
-    let cp = int(rune)
+  for r in runes(cps):
     if skipOne:
       skipOne = false
       continue
-    if isSupplementary(cp):
+    if isSupplementary(r):
       skipOne = true
     let
-      props = properties(cp)
+      props = properties(r)
       canonicalClass = combining(props)
     if lastCanonicalClass > canonicalClass and canonicalClass != 0:
       result = QcStatus.NO
@@ -625,11 +621,11 @@ proc cmpNfd*(a, b: string): bool =
       if di == len(dcps):
         di = 0
         fastRuneAt(s, ni, r, true)
-        decompose(dcps, r.int, NfType.NFD)
+        decompose(dcps, r, NfType.NFD)
       while di < len(dcps):
         cp = dcps[di]
         let props = properties(cp)
-        ccc = combining(props)
+        ccc = combining(props).int32 # todo: return i8?
         let
           qc = quickCheck(props)
           isSafeBreak = (
@@ -646,7 +642,7 @@ proc cmpNfd*(a, b: string): bool =
         break
   result = true
   var
-    cpa, cpb, ccca, cccb: int
+    cpa, cpb, ccca, cccb: int32
     ra, rb: Rune
     nia, nib, dia, dib = 0
     buffa, cccsa, dcpsa: Buffer
