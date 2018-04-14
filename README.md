@@ -15,13 +15,18 @@ buffered and takes O(n) time and O(1) space.
 ```nim
 import normalize
 
-echo toNFC("E◌̀")  # @[Rune(0x00C8)]
-# È
+# Normalization
+assert toNfc("E◌̀") == "È"
+assert toNfc("\u0045\u0300") == "\u00C8"
+assert toNfd("È") == "E◌̀"
+assert toNfd("\u00C8") == "\u0045\u0300"
 
-echo toNFD("È")  # @[Rune(0x0045), Rune(0x0300)]
-# E◌̀
+# toNfkc and toNfkd are also available
 
-# toNFKC and toNFKD are also available
+# Canonical comparison
+assert cmpNfd(
+  "Voulez-vous un caf\u00E9?",
+  "Voulez-vous un caf\u0065\u0301?")
 ```
 
 > Note: when printing to a terminal,
