@@ -72,6 +72,11 @@ let
   testExcludeData = parsePart1()
   maxCP = 0x10FFFF
 
+proc toUTF8(s: seq[Rune]): string =
+  result = ""
+  for r in s:
+    result.add(r.toUTF8)
+
 test "Test NFD":
   ##    NFD
   ##      c3 ==  toNFD(c1) ==  toNFD(c2) ==  toNFD(c3)
@@ -83,6 +88,17 @@ test "Test NFD":
     check record.nfd == toNFD(record.nfd)
     check record.nfkd == toNFD(record.nfkc)
     check record.nfkd == toNFD(record.nfkd)
+    inc i
+  echo "tested $# records" % $i
+
+test "Test NFD strings":
+  var i = 0
+  for record in testData:
+    check record.nfd.toUTF8 == toNFD(record.source.toUTF8)
+    check record.nfd.toUTF8 == toNFD(record.nfc.toUTF8)
+    check record.nfd.toUTF8 == toNFD(record.nfd.toUTF8)
+    check record.nfkd.toUTF8 == toNFD(record.nfkc.toUTF8)
+    check record.nfkd.toUTF8 == toNFD(record.nfkd.toUTF8)
     inc i
   echo "tested $# records" % $i
 
@@ -105,6 +121,15 @@ test "Test NFC":
     check record.nfc == toNFC(record.source)
     check record.nfc == toNFC(record.nfc)
     check record.nfc == toNFC(record.nfd)
+    inc i
+  echo "tested $# records" % $i
+
+test "Test NFC strings":
+  var i = 0
+  for record in testData:
+    check record.nfc.toUTF8 == toNFC(record.source.toUTF8)
+    check record.nfc.toUTF8 == toNFC(record.nfc.toUTF8)
+    check record.nfc.toUTF8 == toNFC(record.nfd.toUTF8)
     inc i
   echo "tested $# records" % $i
 
@@ -132,6 +157,17 @@ test "Test NFKD":
     inc i
   echo "tested $# records" % $i
 
+test "Test NFKD strings":
+  var i = 0
+  for record in testData:
+    check record.nfkd.toUTF8 == toNFKD(record.source.toUTF8)
+    check record.nfkd.toUTF8 == toNFKD(record.nfc.toUTF8)
+    check record.nfkd.toUTF8 == toNFKD(record.nfd.toUTF8)
+    check record.nfkd.toUTF8 == toNFKD(record.nfkc.toUTF8)
+    check record.nfkd.toUTF8 == toNFKD(record.nfkd.toUTF8)
+    inc i
+  echo "tested $# records" % $i
+
 test "Test NFKC":
   ##    NFKC
   ##      c4 == toNFKC(c1) == toNFKC(c2) == toNFKC(c3) == toNFKC(c4) == toNFKC(c5)
@@ -142,6 +178,17 @@ test "Test NFKC":
     check record.nfkc == toNFKC(record.nfd)
     check record.nfkc == toNFKC(record.nfkc)
     check record.nfkc == toNFKC(record.nfkd)
+    inc i
+  echo "tested $# records" % $i
+
+test "Test NFKC strings":
+  var i = 0
+  for record in testData:
+    check record.nfkc.toUTF8 == toNFKC(record.source.toUTF8)
+    check record.nfkc.toUTF8 == toNFKC(record.nfc.toUTF8)
+    check record.nfkc.toUTF8 == toNFKC(record.nfd.toUTF8)
+    check record.nfkc.toUTF8 == toNFKC(record.nfkc.toUTF8)
+    check record.nfkc.toUTF8 == toNFKC(record.nfkd.toUTF8)
     inc i
   echo "tested $# records" % $i
 
@@ -176,6 +223,14 @@ test "Test it does not add a grapheme joiner":
     text.add(Rune(0x0041))
   check(Rune(0x034F) notin toNFC(text))
 
+test "Test expansion factors":
+  echo len("𝅘𝅥𝅮")
+  echo len(toNFC("𝅘𝅥𝅮"))
+  echo len("𝅘𝅥𝅮".toRunes)
+  echo len(toNFC("𝅘𝅥𝅮".toRunes))
+  #check(len(toNFC("𝅘𝅥𝅮")) == len("𝅘𝅥𝅮")*3)
+  #check(len(toNFC("𝅘𝅥𝅮".toRunes)) == len("𝅘𝅥𝅮".toRunes)*3)
+
 test "Test is NFC":
   check(not isNFC(@[Rune(0x1E0A), Rune(0x0323)]))
   check(not isNFC(toNFC(@[Rune(0x1E0C), Rune(0x0307)])))  # Maybe
@@ -192,11 +247,6 @@ test "Test idempotency":
     check toNFKD(record.source) == toNFKD(toNFKD(record.source))
     check toNFC(record.source) == toNFC(toNFC(record.source))
     check toNFKC(record.source) == toNFKC(toNFKC(record.source))
-
-proc toUTF8(s: seq[Rune]): string =
-  result = ""
-  for r in s:
-    result.add(r.toUTF8)
 
 test "Test cmpNFD":
   var i = 0

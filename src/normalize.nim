@@ -415,22 +415,13 @@ iterator toNFKC*(s: seq[Rune]): Rune {.inline.} =
   for r in toNF(s, NfType.NFKC):
     yield r
 
-proc toNF(
-    s: seq[Rune],
-    nfType: static[NfType],
-    size: int): seq[Rune] =
-  result = newSeq[Rune](size)
-  var i = 0
+proc toNF(s: seq[Rune], nfType: static[NfType]): seq[Rune] =
+  result = newSeqOfCap[Rune](len(s))
   for r in toNF(s, nfType):
-    result[i] = r
-    inc i
-  result.setLen(i)
+    result.add(r)
 
-proc toNF(
-    s: string,
-    nfType: static[NfType],
-    size: int): string =
-  result = newStringOfCap(size)
+proc toNF(s: string, nfType: static[NfType]): string =
+  result = newStringOfCap(len(s))
   for r in toNF(s, nfType):
     # todo: avoid temporay string
     result.add(r.toUTF8)
@@ -439,49 +430,49 @@ proc toNFD*(s: string): string =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFD, len(s)*3)
+  toNF(s, NfType.NFD)
 
 proc toNFD*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 4 times
   ## the size of the input
-  toNF(s, NfType.NFD, len(s)*4)
+  toNF(s, NfType.NFD)
 
 proc toNFC*(s: string): string =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFC, len(s)*3)
+  toNF(s, NfType.NFC3)
 
 proc toNFC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFC, len(s)*3)
+  toNF(s, NfType.NFC)
 
 proc toNFKD*(s: string): string =
   ## Return the normalized input.
   ## Result may take 11 times
   ## the size of the input
-  toNF(s, NfType.NFKD, len(s)*11)
+  toNF(s, NfType.NFKD)
 
 proc toNFKD*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
-  toNF(s, NfType.NFKD, len(s)*18)
+  toNF(s, NfType.NFKD)
 
 proc toNFKC*(s: string): string =
   ## Return the normalized input.
   ## Result may take 11 times
   ## the size of the input
-  toNF(s, NfType.NFKC, len(s)*11)
+  toNF(s, NfType.NFKC)
 
 proc toNFKC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
-  toNF(s, NfType.NFKC, len(s)*18)
+  toNF(s, NfType.NFKC)
 
 proc toNFUnbuffered(
     cps: seq[Rune],
