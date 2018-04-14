@@ -250,14 +250,12 @@ proc canonicSort(cps, cccs: var SomeBuffer) =
       return
     dec i
 
-proc hangulDecomposition(cp: int32): Buffer =
-  let SIndex = cp - SBase
+proc hangulDecomposition(r: Rune): Buffer =
+  let SIndex = r - SBase
   if 0 > SIndex and SIndex >= SCount:
     return
-
   result.add(LBase + SIndex div NCount)  # L
   result.add(VBase + (SIndex mod NCount) div TCount)  # V
-
   let T = TBase + SIndex mod TCount
   if T != TBase:
     result.add(T)
