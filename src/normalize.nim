@@ -18,7 +18,9 @@
 
 import unicode
 
-import unicodedb
+import unicodedb/compositions
+import unicodedb/decompositions
+import unicodedb/properties
 
 # A Rune is a distinct int32. Well, not anymore...
 converter toInt32(x: Rune): int32 = x.int32
