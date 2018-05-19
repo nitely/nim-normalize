@@ -265,62 +265,35 @@ proc hangulDecomposition(r: Rune): Buffer =
 proc isHangul(r: Rune): bool {.inline.} =
   0xAC00 <= r and r <= 0xD7A3
 
-# NFD
-# NFC (+ canonic_composition later)
-proc canonicalDcp(r: Rune): Buffer =
-  ## Return 4 code points at most.
-  ## It does a full canonical decomposition
-  if r.isHangul:
-    result = hangulDecomposition(r)
-    if result.len == 0:
-      result.add(r)
-    return
-  var
-    rA = r
-    i = 0
-  while true:
-    i = 0
-    for rX in canonicalDecomposition(rA.Rune):
-      if i == 0:
-        rA = rX
-      else:
-        result.add(rX)
-      inc i
-    if i == 0:
-      result.add(rA)
-      break
-  result.reverse()
-
-# NFKD
-# NFKC (+ canonicalComposition later)
-proc compatibilityDecomposition(r: Rune): Buffer =
-  ## Return 18 code points at most.
+template decomposeImpl(result, r, decompositionProc) =
+  ## Return 4 code points at most for NFD and NFC.
+  ## Return 18 code points at most for NFKD and NFKC.
   ## It does a full decomposition
   if r.isHangul:
     result = hangulDecomposition(r)
     if result.len == 0:
       result.add(r)
-    return
-
-  var queue: Buffer
-  queue.add(r)
-  while queue.len > 0:
-    let
-      curCp = queue.pop()
-      lastLen = queue.len
-    for dcp in decomposition(curCp.Rune):
-      queue.add(dcp)
-    if lastLen == queue.len:  # No decomposition
-      result.add(curCp)
-  result.reverse()
-
-const graphemeJoiner = 0x034F.Rune
+  else:
+    result.clear()
+    var queue: Buffer
+    queue.add(r)
+    while queue.len > 0:
+      let
+        curCp = queue.pop()
+        lastLen = queue.len
+      for dcp in decompositionProc(curCp.Rune):
+        queue.add(dcp)
+      if lastLen == queue.len:  # No decomposition
+        result.add(curCp)
+    result.reverse()
 
 template decompose(result, r, nfType) =
   when nfType in {NfType.NFC, NfType.NFD}:
-    result = canonicalDcp(r)
+    decomposeImpl(result, r, canonicalDecomposition)
   else:
-    result = compatibilityDecomposition(r)
+    decomposeImpl(result, r, decomposition)
+
+const graphemeJoiner = 0x034F.Rune
 
 iterator runesN(s: string): (bool, Rune) {.inline.} =
   var
