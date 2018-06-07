@@ -10,6 +10,16 @@ buffered and takes O(n) time and O(1) space.
 > Note: the ``iterator`` version takes O(1)
 > space, but the ``proc`` takes O(n) space.
 
+## Install
+
+```
+nimble install normalize
+```
+
+## Compatibility
+
+Nim 0.17.2, 0.18.0
+
 ## Usage
 
 ```nim
