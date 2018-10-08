@@ -105,36 +105,40 @@ proc `==`(a, b: Buffer): bool =
     inc i
 
 type
-  NfType {.pure.} = enum
-    NFC, NFKC, NFD, NFKD
+  NfType = enum
+    nftNfc
+    nftNfkc
+    nftNfd
+    nftNfkd
 
-  QcStatus {.pure.} = enum
-    YES, NO, MAYBE
+  QcStatus = enum
+    qcsYes
+    qcsNo
+    qcsMaybe
 
 const nfMasks: array[NfType, array[2, (NfMask, QcStatus)]] = [
-  [(nfcQcNo, QcStatus.NO),
-   (nfcQcMaybe, QcStatus.MAYBE)],
-  [(nfkcQcNo, QcStatus.NO),
-   (nfkcQcMaybe, QcStatus.MAYBE)],
-  [(nfdQcNo, QcStatus.NO),
-   (nfdQcNo, QcStatus.NO)],
-  [(nfkdQcNo, QcStatus.NO),
-   (nfkdQcNo, QcStatus.NO)]]
+  [(nfcQcNo, qcsNo),
+   (nfcQcMaybe, qcsMaybe)],
+  [(nfkcQcNo, qcsNo),
+   (nfkcQcMaybe, qcsMaybe)],
+  [(nfdQcNo, qcsNo),
+   (nfdQcNo, qcsNo)],
+  [(nfkdQcNo, qcsNo),
+   (nfkdQcNo, qcsNo)]]
 
 proc isAllowed(qc: int, nfType: NfType): QcStatus {.inline.} =
   ## Return the quick check property value
-  result = QcStatus.YES
+  result = qcsYes
   for mask, status in items(nfMasks[nfType]):
     if mask in qc:
       result = status
       return
 
-proc primaryComposite(rA: Rune, rB: Rune): Rune {.inline.} =
+proc primaryComposite(r: var Rune, rA: Rune, rB: Rune): bool {.inline.} =
   ## Find the composition of two decomposed CPs
   # This does not include hangul chars
   # as those can be dynamically computed
-  # todo: pass runes and implement a non raisy API
-  composition(rA.int, rB.int).int32
+  result = composition(r, rA, rB)
 
 # Hangul
 const
@@ -180,6 +184,7 @@ proc canonicalComposition(cps: var SomeBuffer) =
     lastStarterIdx = -1
     lastCCC = -1
     pos = 0
+    pcp: Rune
   for cp in cps:
     # Hangul composition
     if lastStarterIdx != -1 and
@@ -206,8 +211,7 @@ proc canonicalComposition(cps: var SomeBuffer) =
       cps[pos] = cp
       inc pos
       continue
-    let pcp = primaryComposite(cps[lastStarterIdx], cp)
-    if pcp != -1:
+    if primaryComposite(pcp, cps[lastStarterIdx], cp):
       cps[lastStarterIdx] = pcp
       assert combining(pcp) == 0
       lastCCC = 0
@@ -288,7 +292,7 @@ template decomposeImpl(result, r, decompositionProc) =
     result.reverse()
 
 template decompose(result, r, nfType) =
-  when nfType in {NfType.NFC, NfType.NFD}:
+  when nfType in {nftNfc, nftNfd}:
     decomposeImpl(result, r, canonicalDecomposition)
   else:
     decomposeImpl(result, r, decomposition)
@@ -323,7 +327,7 @@ iterator toNF(
         ccc = combining(props).int32  # todo: return i8?
         qc = quickCheck(props)
         isSafeBreak = (
-          isAllowed(qc, nfType) == QcStatus.YES and
+          isAllowed(qc, nfType) == qcsYes and
           ccc == 0)
       if finished or isSafeBreak or buff.left == 1:
         if finished:
@@ -331,7 +335,7 @@ iterator toNF(
           cccs.add(ccc)
         # Flush the buffer
         buff.canonicSort(cccs)
-        when nfType in {NfType.NFC, NfType.NFKC}:
+        when nfType in {nftNfc, nftNfkc}:
           buff.canonicalComposition()
         for bcp in items(buff):
           yield Rune(bcp)
@@ -347,42 +351,42 @@ iterator toNF(
 
 iterator toNFD*(s: string): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFD):
+  for r in toNF(s, nftNfd):
     yield r
 
 iterator toNFD*(s: seq[Rune]): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFD):
+  for r in toNF(s, nftNfd):
     yield r
 
 iterator toNFC*(s: string): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFC):
+  for r in toNF(s, nftNfc):
     yield r
 
 iterator toNFC*(s: seq[Rune]): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFC):
+  for r in toNF(s, nftNfc):
     yield r
 
 iterator toNFKD*(s: string): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFKD):
+  for r in toNF(s, nftNfkd):
     yield r
 
 iterator toNFKD*(s: seq[Rune]): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFKD):
+  for r in toNF(s, nftNfkd):
     yield r
 
 iterator toNFKC*(s: string): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFKC):
+  for r in toNF(s, nftNfkc):
     yield r
 
 iterator toNFKC*(s: seq[Rune]): Rune {.inline.} =
   ## Iterates over each normalized unicode character
-  for r in toNF(s, NfType.NFKC):
+  for r in toNF(s, nftNfkc):
     yield r
 
 proc toNF(s: seq[Rune], nfType: static[NfType]): seq[Rune] =
@@ -415,55 +419,55 @@ proc toNFD*(s: string): string =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFD)
+  toNF(s, nftNfd)
 
 proc toNFD*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 4 times
   ## the size of the input
-  toNF(s, NfType.NFD)
+  toNF(s, nftNfd)
 
 proc toNFC*(s: string): string =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFC)
+  toNF(s, nftNfc)
 
 proc toNFC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
-  toNF(s, NfType.NFC)
+  toNF(s, nftNfc)
 
 proc toNFKD*(s: string): string =
   ## Return the normalized input.
   ## Result may take 11 times
   ## the size of the input
-  toNF(s, NfType.NFKD)
+  toNF(s, nftNfkd)
 
 proc toNFKD*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
-  toNF(s, NfType.NFKD)
+  toNF(s, nftNfkd)
 
 proc toNFKC*(s: string): string =
   ## Return the normalized input.
   ## Result may take 11 times
   ## the size of the input
-  toNF(s, NfType.NFKC)
+  toNF(s, nftNfkc)
 
 proc toNFKC*(s: seq[Rune]): seq[Rune] =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
-  toNF(s, NfType.NFKC)
+  toNF(s, nftNfkc)
 
 proc toNFUnbuffered(
     cps: seq[Rune],
     nfType: static[NfType]): seq[Rune] {.used.} =
   ## This exists for testing purposes
-  let isComposable = nfType in [NfType.NFC, NfType.NFKC]
+  let isComposable = nfType in [nftNfc, nftNfkc]
   var
     cpsB = newSeqOfCap[int32](result.len)
     cccs = newSeqOfCap[int32](result.len)
@@ -497,7 +501,7 @@ proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
   ## result, even if the string
   ## is perfectly normalized.
   ## Result ain't always Yes or No
-  result = QcStatus.YES
+  result = qcsYes
   var
     lastCanonicalClass = 0
     skipOne = false
@@ -511,63 +515,63 @@ proc isNF(cps: (seq[Rune] | string), nfType: NfType): QcStatus =
       props = properties(r)
       canonicalClass = combining(props)
     if lastCanonicalClass > canonicalClass and canonicalClass != 0:
-      result = QcStatus.NO
+      result = qcsNo
       return
     let check = isAllowed(quickCheck(props), nfType)
-    if check == QcStatus.NO:
-      result = QcStatus.NO
+    if check == qcsNo:
+      result = qcsNo
       return
-    if check == QcStatus.MAYBE:
-      result = QcStatus.MAYBE
+    if check == qcsMaybe:
+      result = qcsMaybe
     lastCanonicalClass = canonicalClass
 
 proc isNFC*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFC) == QcStatus.YES
+  isNF(s, nftNfc) == qcsYes
 
 proc isNFC*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFC) == QcStatus.YES
+  isNF(s, nftNfc) == qcsYes
 
 proc isNFD*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFD) == QcStatus.YES
+  isNF(s, nftNfd) == qcsYes
 
 proc isNFD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFD) == QcStatus.YES
+  isNF(s, nftNfd) == qcsYes
 
 proc isNFKC*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFKC) == QcStatus.YES
+  isNF(s, nftNfkc) == qcsYes
 
 proc isNFKC*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFKC) == QcStatus.YES
+  isNF(s, nftNfkc) == qcsYes
 
 proc isNFKD*(s: string): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFKD) == QcStatus.YES
+  isNF(s, nftNfkd) == qcsYes
 
 proc isNFKD*(s: seq[Rune]): bool {.inline.} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
-  isNF(s, NfType.NFKD) == QcStatus.YES
+  isNF(s, nftNfkd) == qcsYes
 
 # todo: cmpNfkd for compat cmp
 proc cmpNfd*(a, b: string): bool =
@@ -594,7 +598,7 @@ proc cmpNfd*(a, b: string): bool =
       if di == len(dcps):
         di = 0
         fastRuneAt(s, ni, r, true)
-        decompose(dcps, r, NfType.NFD)
+        decompose(dcps, r, nftNfd)
       while di < len(dcps):
         cp = dcps[di]
         let props = properties(cp)
@@ -602,7 +606,7 @@ proc cmpNfd*(a, b: string): bool =
         let
           qc = quickCheck(props)
           isSafeBreak = (
-            isAllowed(qc, NfType.NFD) == QcStatus.YES and
+            isAllowed(qc, nftNfd) == qcsYes and
             ccc == 0)
           finished = ni == len(s) and di == high(dcps)
         if not finished and (isSafeBreak or buff.left == 1):
@@ -653,10 +657,10 @@ when isMainModule:
     for line in lines("./tests/TestNormRandomText.txt"):
       text.add(line.toRunes)
       text2.add(line)
-    doAssert toNFUnbuffered(text, NfType.NFD) == toNFD(text)
-    doAssert toNFUnbuffered(text, NfType.NFC) == toNFC(text)
-    doAssert toNFUnbuffered(text, NfType.NFKC) == toNFKC(text)
-    doAssert toNFUnbuffered(text, NfType.NFKD) == toNFKD(text)
+    doAssert toNFUnbuffered(text, nftNfd) == toNFD(text)
+    doAssert toNFUnbuffered(text, nftNfc) == toNFC(text)
+    doAssert toNFUnbuffered(text, nftNfkc) == toNFKC(text)
+    doAssert toNFUnbuffered(text, nftNfkd) == toNFKD(text)
 
     doAssert isNFD(toNFD(text))
     doAssert isNFC(toNFC(text))

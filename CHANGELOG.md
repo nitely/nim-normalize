@@ -1,3 +1,10 @@
+v0.4.0
+==================
+
+* Drop support for Nim 0.17
+* Add support for Nim 0.19
+* Update dependencies
+
 v0.3.1
 ==================
 
