@@ -1,5 +1,5 @@
-import unittest, strutils, unicode, algorithm
-
+import unittest, strutils, algorithm
+import unicode except strip
 import normalize
 
 type
