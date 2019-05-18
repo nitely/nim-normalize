@@ -1,3 +1,9 @@
+v0.6.0
+==================
+
+* Change `cmpNfd` signature to accept `openArray[char]`
+  instead of `string`
+
 v0.5.0
 ==================
 
