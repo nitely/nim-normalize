@@ -286,9 +286,10 @@ test "Test some cmpNFD":
   check(not cmpNfd("aa", "a"))
   check(not cmpNfd("\u00E9-a", "\u0065\u0301-b"))
 
-test "Test some cmpNFD":
-  check cmpNfd("".toOpenArray(0, -1), "".toOpenArray(0, -1))
-  check cmpNfd("a".toOpenArray(0, 0), "a".toOpenArray(0, 0))
-  check cmpNfd("abc".toOpenArray(0, 2), "abc".toOpenArray(0, 2))
-  check cmpNfd("abcd".toOpenArray(0, 2), "abcz".toOpenArray(0, 2))
-  check(not cmpNfd("abcd".toOpenArray(0, 3), "abcz".toOpenArray(0, 3)))
+when (NimMajor, NimMinor, NimPatch) >= (0, 19, 0):
+  test "Test openArray cmpNFD":
+    check cmpNfd("".toOpenArray(0, -1), "".toOpenArray(0, -1))
+    check cmpNfd("a".toOpenArray(0, 0), "a".toOpenArray(0, 0))
+    check cmpNfd("abc".toOpenArray(0, 2), "abc".toOpenArray(0, 2))
+    check cmpNfd("abcd".toOpenArray(0, 2), "abcz".toOpenArray(0, 2))
+    check(not cmpNfd("abcd".toOpenArray(0, 3), "abcz".toOpenArray(0, 3)))
