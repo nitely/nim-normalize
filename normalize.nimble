@@ -1,6 +1,6 @@
 # Package
 
-version = "0.6.0"
+version = "0.7.0"
 author = "Esteban Castro Borsani (@nitely)"
 description = "Unicode normalization forms (tr15)"
 license = "MIT"
@@ -10,7 +10,7 @@ skipDirs = @["tests"]
 
 # Dependencies
 
-requires "nim >= 0.18.0"
+requires "nim >= 0.19.0"
 requires "unicodedb >= 0.7"
 
 task test, "Test":
