@@ -380,9 +380,9 @@ iterator toNF(
         props = properties(cp)
         ccc = combining(props).int32  # todo: return i8?
         qc = quickCheck(props)
-        isSafeBreak = (
+        isSafeBreak =
           isAllowed(qc, nfType) == qcsYes and
-          ccc == 0)
+          ccc == 0
       if finished or isSafeBreak or buff.left == 1:
         if finished:
           buff.add(cp)
@@ -636,41 +636,40 @@ proc cmpNfd*(a, b: openArray[char]): bool =
   ## does not create temporary strings
   ## (i.e it won't allocate).
   template fillBuffer(
-      s: openArray[char],
-      ni, di: var int,
-      r: var Rune,
-      buff, cccs, dcps: var Buffer,
-      cp, ccc: var int,
-      compare: var bool) =
+    s: openArray[char],
+    ni, di: var int,
+    r: var Rune,
+    buff, cccs, dcps: var Buffer,
+    cp, ccc: var int
+  ) =
     ## This is meant to be called and
     ## resumed later with a partially
     ## consumed "decomposed rune"
     assert ni <= len(s)
     assert di <= len(dcps)
-    compare = false
-    while ni < len(s) or di < len(dcps):
-      if di == len(dcps):
-        di = 0
-        fastRuneAt(s, ni, r, true)
-        decompose(dcps, r, nftNfd)
-      while di < len(dcps):
-        cp = dcps[di]
-        let props = properties(cp)
-        ccc = combining(props).int32 # todo: return i8?
-        let
-          qc = quickCheck(props)
-          isSafeBreak = (
-            isAllowed(qc, nftNfd) == qcsYes and
-            ccc == 0)
-          finished = ni == len(s) and di == high(dcps)
-        if not finished and (isSafeBreak or buff.left == 1):
-          compare = true
-          break
-        buff.add(cp)
-        cccs.add(ccc)
-        inc di
-      if compare:
-        break
+    block fillBuff:
+      # decompose s[ni] into dcps
+      # and fill buff and cccs buffers
+      while ni < len(s) or di < len(dcps):
+        if di == len(dcps):
+          di = 0
+          fastRuneAt(s, ni, r, true)
+          decompose(dcps, r, nftNfd)
+        while di < len(dcps):
+          cp = dcps[di]
+          let props = properties(cp)
+          ccc = combining(props).int32 # todo: return i8?
+          let
+            qc = quickCheck(props)
+            isSafeBreak =
+              isAllowed(qc, nftNfd) == qcsYes and
+              ccc == 0
+            finished = ni == len(s) and di == high(dcps)
+          if not finished and (isSafeBreak or buff.left == 1):
+            break fillBuff
+          buff.add(cp)
+          cccs.add(ccc)
+          inc di
   result = true
   var
     cpa, cpb, ccca, cccb: int32
@@ -678,25 +677,23 @@ proc cmpNfd*(a, b: openArray[char]): bool =
     nia, nib, dia, dib = 0
     buffa, cccsa, dcpsa: Buffer
     buffb, cccsb, dcpsb: Buffer
-    compare = false
-  while (
-      nia < len(a) or dia < len(dcpsa) or
-      nib < len(b) or dib < len(dcpsb)):
-    fillBuffer(a, nia, dia, ra, buffa, cccsa, dcpsa, cpa, ccca, compare)
-    fillBuffer(b, nib, dib, rb, buffb, cccsb, dcpsb, cpb, cccb, compare)
+  while nia < len(a) or dia < len(dcpsa) or
+        nib < len(b) or dib < len(dcpsb):
+    fillBuffer(a, nia, dia, ra, buffa, cccsa, dcpsa, cpa, ccca)
+    fillBuffer(b, nib, dib, rb, buffb, cccsb, dcpsb, cpb, cccb)
     buffa.canonicSort(cccsa)
     buffb.canonicSort(cccsb)
     result = buffa == buffb
     if not result:
       return
     buffa.clear()
-    buffb.clear()
     cccsa.clear()
-    cccsb.clear()
     if nia < len(a) or dia < len(dcpsa):
       buffa.add(cpa)
       cccsa.add(ccca)
       inc dia
+    buffb.clear()
+    cccsb.clear()
     if nib < len(b) or dib < len(dcpsb):
       buffb.add(cpb)
       cccsb.add(cccb)
