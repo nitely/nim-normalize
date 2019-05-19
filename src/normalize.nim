@@ -156,16 +156,7 @@ proc pop(buffer: var Buffer): int32 {.inline.} =
   dec buffer.pos
 
 proc `==`(a, b: Buffer): bool =
-  # todo: memcmp
-  result = len(a) == len(b)
-  if not result:
-    return
-  var i = 0
-  while i < len(a):
-    result = a.data[i] == b.data[i]
-    if not result:
-      return
-    inc i
+  a.data.toOpenArray(0, a.len-1) == b.data.toOpenArray(0, b.len-1)
 
 type
   NfType = enum
