@@ -39,7 +39,7 @@ assert cmpNfd(
   "Voulez-vous un caf\u0065\u0301?")
 
 # Normalization check (not always reliable, see docs)
-assert isNFD(toNFD("\u1E0A"))
+assert isNfd(toNfd("\u1E0A"))
 
 # isNfc, isNfkc and isNfkd are also available
 ```
@@ -49,6 +49,25 @@ assert isNFD(toNFD("\u1E0A"))
 > Better try printing the len or the runes
 
 [docs](https://nitely.github.io/nim-normalize/)
+
+## Optimizations
+
+The best optimization is to avoid normalizing when the text
+is already normalized. The `isNf` family of procs can be
+used for this purpose.
+
+```nim
+import normalize
+
+template fastNfc(s: var string) =
+  if not isNfc(s):
+    s = toNfc(s)
+```
+
+> Beware `isNf` may return `false` even after normalizing,
+  this is because the internal check has 3 possible outputs
+  "Yes", "No" and "MayBe". The problem is the output may
+  always be "MayBe" for certain texts.
 
 ## Tests
 
