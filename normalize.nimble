@@ -1,6 +1,6 @@
 # Package
 
-version = "0.7.0"
+version = "0.7.1"
 author = "Esteban Castro Borsani (@nitely)"
 description = "Unicode normalization forms (tr15)"
 license = "MIT"
