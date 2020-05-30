@@ -1,6 +1,6 @@
 # Package
 
-version = "0.7.1"
+version = "0.8.0"
 author = "Esteban Castro Borsani (@nitely)"
 description = "Unicode normalization forms (tr15)"
 license = "MIT"
@@ -18,4 +18,4 @@ task test, "Test":
   exec "nim c -r tests/tests"
 
 task docs, "Docs":
-  exec "nim doc2 -o:./docs/index.html ./src/normalize.nim"
+  exec "nim doc --project -o:./docs ./src/normalize.nim"

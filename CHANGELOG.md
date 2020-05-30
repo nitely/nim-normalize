@@ -1,3 +1,8 @@
+v0.8.0
+==================
+
+* Deprecate functions taking a `seq[Rune]`
+
 v0.7.0
 ==================
 

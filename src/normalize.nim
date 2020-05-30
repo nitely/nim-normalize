@@ -408,7 +408,7 @@ iterator toNFD*(s: string): Rune {.inline.} =
   for r in toNF(s, nftNfd):
     yield r
 
-iterator toNFD*(s: seq[Rune]): Rune {.inline.} =
+iterator toNFD*(s: seq[Rune]): Rune {.inline, deprecated: "Use toNFD(string)".} =
   ## Iterates over each normalized unicode character
   for r in toNF(s, nftNfd):
     yield r
@@ -418,7 +418,7 @@ iterator toNFC*(s: string): Rune {.inline.} =
   for r in toNF(s, nftNfc):
     yield r
 
-iterator toNFC*(s: seq[Rune]): Rune {.inline.} =
+iterator toNFC*(s: seq[Rune]): Rune {.inline, deprecated: "Use toNFC(string)".} =
   ## Iterates over each normalized unicode character
   for r in toNF(s, nftNfc):
     yield r
@@ -428,7 +428,7 @@ iterator toNFKD*(s: string): Rune {.inline.} =
   for r in toNF(s, nftNfkd):
     yield r
 
-iterator toNFKD*(s: seq[Rune]): Rune {.inline.} =
+iterator toNFKD*(s: seq[Rune]): Rune {.inline, deprecated: "Use toNFKD(string)".} =
   ## Iterates over each normalized unicode character
   for r in toNF(s, nftNfkd):
     yield r
@@ -438,7 +438,7 @@ iterator toNFKC*(s: string): Rune {.inline.} =
   for r in toNF(s, nftNfkc):
     yield r
 
-iterator toNFKC*(s: seq[Rune]): Rune {.inline.} =
+iterator toNFKC*(s: seq[Rune]): Rune {.inline, deprecated: "Use toNFKC(string)".} =
   ## Iterates over each normalized unicode character
   for r in toNF(s, nftNfkc):
     yield r
@@ -475,7 +475,7 @@ proc toNFD*(s: string): string =
   ## the size of the input
   toNF(s, nftNfd)
 
-proc toNFD*(s: seq[Rune]): seq[Rune] =
+proc toNFD*(s: seq[Rune]): seq[Rune] {.deprecated: "Use toNFD(string)".} =
   ## Return the normalized input.
   ## Result may take 4 times
   ## the size of the input
@@ -487,7 +487,7 @@ proc toNFC*(s: string): string =
   ## the size of the input
   toNF(s, nftNfc)
 
-proc toNFC*(s: seq[Rune]): seq[Rune] =
+proc toNFC*(s: seq[Rune]): seq[Rune] {.deprecated: "Use toNFC(string)".} =
   ## Return the normalized input.
   ## Result may take 3 times
   ## the size of the input
@@ -499,7 +499,7 @@ proc toNFKD*(s: string): string =
   ## the size of the input
   toNF(s, nftNfkd)
 
-proc toNFKD*(s: seq[Rune]): seq[Rune] =
+proc toNFKD*(s: seq[Rune]): seq[Rune] {.deprecated: "Use toNFKD(string)".} =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
@@ -511,7 +511,7 @@ proc toNFKC*(s: string): string =
   ## the size of the input
   toNF(s, nftNfkc)
 
-proc toNFKC*(s: seq[Rune]): seq[Rune] =
+proc toNFKC*(s: seq[Rune]): seq[Rune] {.deprecated: "Use toNFKC(string)".} =
   ## Return the normalized input.
   ## Result may take 18 times
   ## the size of the input
@@ -585,7 +585,7 @@ proc isNFC*(s: string): bool {.inline.} =
   ## the result is always ``false`` (even if it's normalized)
   isNF(s, nftNfc) == qcsYes
 
-proc isNFC*(s: seq[Rune]): bool {.inline.} =
+proc isNFC*(s: seq[Rune]): bool {.inline, deprecated: "Use isNFC(string)".} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
@@ -597,7 +597,7 @@ proc isNFD*(s: string): bool {.inline.} =
   ## the result is always ``false`` (even if it's normalized)
   isNF(s, nftNfd) == qcsYes
 
-proc isNFD*(s: seq[Rune]): bool {.inline.} =
+proc isNFD*(s: seq[Rune]): bool {.inline, deprecated: "Use isNFD(string)".} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
@@ -609,7 +609,7 @@ proc isNFKC*(s: string): bool {.inline.} =
   ## the result is always ``false`` (even if it's normalized)
   isNF(s, nftNfkc) == qcsYes
 
-proc isNFKC*(s: seq[Rune]): bool {.inline.} =
+proc isNFKC*(s: seq[Rune]): bool {.inline, deprecated: "Use isNFKC(string)".} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
@@ -621,7 +621,7 @@ proc isNFKD*(s: string): bool {.inline.} =
   ## the result is always ``false`` (even if it's normalized)
   isNF(s, nftNfkd) == qcsYes
 
-proc isNFKD*(s: seq[Rune]): bool {.inline.} =
+proc isNFKD*(s: seq[Rune]): bool {.inline, deprecated: "Use isNFKD(string)".} =
   ## Return whether the unicode characters
   ## are normalized or not. For some inputs
   ## the result is always ``false`` (even if it's normalized)
