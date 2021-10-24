@@ -18,7 +18,7 @@ nimble install normalize
 
 ## Compatibility
 
-Nim +0.19.0
+Nim +1.0.0
 
 ## Usage
 
