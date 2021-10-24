@@ -10,7 +10,7 @@ skipDirs = @["tests"]
 
 # Dependencies
 
-requires "nim >= 0.19.0"
+requires "nim >= 1.0.0"
 requires "unicodedb >= 0.7"
 
 task test, "Test":
