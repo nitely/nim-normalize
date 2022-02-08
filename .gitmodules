@@ -1,0 +1,6 @@
+[submodule "unicodedb"]
+	path = unicodedb
+	url = https://github.com/nitely/nim-unicodedb.git
+	ignore = untracked
+	branch = master
+

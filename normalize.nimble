@@ -14,6 +14,10 @@ requires "nim >= 1.0.0"
 requires "unicodedb >= 0.7"
 
 task test, "Test":
+  # using the Git submodule
+  exec "nim c -r -p:unicodedb/src src/normalize"
+  exec "nim c -r -p:unicodedb/src tests/tests"
+  # using the Nimble package
   exec "nim c -r src/normalize"
   exec "nim c -r tests/tests"
 
