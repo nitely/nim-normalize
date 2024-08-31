@@ -640,7 +640,7 @@ proc cmpNfd*(a, b: openArray[char]): bool =
     ni, di: var int,
     r: var Rune,
     buff, cccs, dcps: var Buffer,
-    cp, ccc: var int
+    cp, ccc: var int32
   ) =
     ## This is meant to be called and
     ## resumed later with a partially
