@@ -1,4 +1,4 @@
-v0.9.0  (UNRELEASED)
+v0.9.0
 ==================
 
 * Drop Nim < 1.0 support
