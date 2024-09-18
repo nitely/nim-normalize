@@ -1,6 +1,6 @@
-import unittest, strutils, algorithm
-import unicode except strip
-import normalize
+import std/unittest, std/strutils, std/algorithm
+import std/unicode except strip
+import ../src/normalize
 
 type
   testRecord = tuple
