@@ -77,6 +77,11 @@ proc toUTF8(s: seq[Rune]): string =
   for r in s:
     result.add(r.toUTF8)
 
+test "Sanity check":
+  check testData.len > 1000
+  check testExcludeData.len > 0
+  check toUTF8(@['a'.ord.Rune, 'b'.ord.Rune]) == "ab"
+
 test "Test NFD":
   ##    NFD
   ##      c3 ==  toNFD(c1) ==  toNFD(c2) ==  toNFD(c3)
